@@ -1,0 +1,8 @@
+.cache/
+.env
+.idea
+.pytest_cache
+
+*.pyc
+*.egg-info
+logs/
