@@ -7,6 +7,7 @@ from copy import deepcopy
 import flags
 from db.mongodriver import MongodbClient
 import log 
+import time
 
 # from rollback_test_data import BLOCK_A, BLOCK_A_00, BLOCK_A_01, BLOCK_A_02, BLOCK_A_10, BLOCK_A_11
 FLAGS = flags.FLAGS
@@ -82,7 +83,7 @@ class GetBytomDataAgent:
         while True and (self.mongo_recent_height is not None):
 
             recent_height = self.request_recent_height()
-
+            print 'recent_height: '+str(recent_height)
             if recent_height is not None:
                 if recent_height < 0:
                     self.logger.error("Agent.GetBytomDataAgent sync_all gets negative recent_height ERROR:" + str(e))
@@ -93,14 +94,14 @@ class GetBytomDataAgent:
 
                     while self.mongo_recent_height < recent_height:
                         next_height = self.mongo_recent_height + 1
-                        block = agent.request_block_info(next_height)
+                        block = self.request_block_info(next_height)
 
                         # update mongodb
                         try:
                             self.logger.info('Syncing block: '+str(next_height))
                             print 'Syncing block: '+str(next_height)
 
-                            agent.sync_block(block, recent_height)
+                            self.sync_block(block, recent_height)
                             self.logger.info("Sync done: " + str(next_height))
                             print "Sync done: " + str(next_height)
 
@@ -192,7 +193,8 @@ class GetBytomDataAgent:
                     prevblock_db_hash = prevblock_db[FLAGS.block_id] if prevblock_db else None
 
             # reverse mainchain_list preventing empty middle block when server shuts down
-            return mainchain_list.reverse(), height_record
+            mainchain_list.reverse()
+            return mainchain_list, height_record
 
         def info_abstract(mainchain_list):
             # pay attention to the change of block's keys
@@ -266,6 +268,7 @@ class GetBytomDataAgent:
 
         
         (mainchain_list, height_record) = get_mainchainlist(block, recent_height)
+
         print 'Length of maichain block pending: '+str(len(mainchain_list))
         self.rollback(height_record, len(mainchain_list))
         # ok
@@ -284,7 +287,7 @@ class GetBytomDataAgent:
 
         print '-------------------------Pending Transaction Info-----------------------'
         for transaction in transaction_info:
-            print str(tranaction)+'\n'
+            print str(transaction)+'\n'
 
         print '-------------------------------------------------------------------------'
         

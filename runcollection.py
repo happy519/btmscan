@@ -7,5 +7,5 @@ FLAGS = flags.FLAGS
 
 if __name__ == "__main__":
     FLAGS(sys.argv)
-    agent = GetBytomDataAgent()
-    agent.sync_all()
+    my_agent = GetBytomDataAgent()
+    my_agent.sync_all()
