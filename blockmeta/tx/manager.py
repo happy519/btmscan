@@ -1,13 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import logging
 from flask import current_app
-from flask import json
-from blockmeta import db, exception, utils, flags, manager
-from blockmeta.constant import EXPIRE_TIME, DISPLAY_LEN
+
 from blockmeta import constant
+from blockmeta import utils, flags, manager
 from blockmeta.cache import CacheControl
+from blockmeta.constant import DISPLAY_LEN
 
 FLAGS = flags.FLAGS
 

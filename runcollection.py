@@ -1,5 +1,5 @@
 import sys
-from collector.agent import GetBytomDataAgent
+from collector.agent.agent import GetBytomDataAgent
 from collector import flags
 
 FLAGS = flags.FLAGS
