@@ -23,6 +23,9 @@ gflags.DEFINE_string('mongo_bytom_port',  27017, 'mongodb port')
 
 # bytomd db
 gflags.DEFINE_string('mongo_bytom', 'bytom', 'mongodb bytom main db')
+gflags.DEFINE_string('mongodb_user', 'bytom', 'mongodb user name')
+gflags.DEFINE_string('mongodb_password', 'bytom', 'mongodb user password')
+gflags.DEFINE_integer('table_capacity', 99000000, 'table capacity')
 
 # bytom table
 gflags.DEFINE_string('db_status', 'status', '')
