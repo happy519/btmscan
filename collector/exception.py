@@ -1,5 +1,4 @@
 
-import logging
 from flask import current_app
 
 LOG = current_app.logger

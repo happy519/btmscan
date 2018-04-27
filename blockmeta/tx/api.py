@@ -3,9 +3,10 @@
 
 from flask import current_app
 from flask.ext.restful import Resource, reqparse
+
 from blockmeta import utils, flags
+from blockmeta.constant import DEFAULT_START, DEFAULT_OFFSET
 from blockmeta.tools.bytom import is_hash_prefix
-from blockmeta.constant import DEFAULT_START, DEFAULT_OFFSET, DEFAULT_LIST
 
 FLAGS = flags.FLAGS
 
@@ -38,7 +39,7 @@ class TxAPI(Resource):
 
             data = self.manager.handle_mempool_tx(tx_hash)
             if not data:
-            data = self.manager.handle_tx(tx_hash, detail, chain_type)
+                data = self.manager.handle_tx(tx_hash, detail, chain_type)
             return utils.wrap_response(data=data)
         except Exception, e:
             self.logger.error("TxAPI.get Error: %s" % str(e))

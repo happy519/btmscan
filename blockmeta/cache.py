@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-import pickle
 import hashlib
+import pickle
 from functools import wraps
-from flask import request, json, current_app as app
+
+from flask import request, current_app as app
+
 from blockmeta import flags
 
 FLAGS = flags.FLAGS
