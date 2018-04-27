@@ -1,18 +1,17 @@
 #! /usr/bin/env python
 #coding=utf-8
 
-import requests
 import json
+import time
 from copy import deepcopy
+
+import requests
+
 from collector import flags, log
 from collector.db.mongodriver import MongodbClient
-import time
 
 # from rollback_test_data import BLOCK_A, BLOCK_A_00, BLOCK_A_01, BLOCK_A_02, BLOCK_A_10, BLOCK_A_11
 FLAGS = flags.FLAGS
-
-
-
 
 # to do: status_fail: when status_fail == true, only update bytom asset
 
@@ -29,14 +28,12 @@ class GetBytomDataAgent:
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
         self.mongo_recent_height = self.request_mongo_recent_height()
 
-
     def request_block_info(self, block_height):
-
         data_dict = {FLAGS.get_block_height_arg: block_height}
         url_rpc = self.url_base + '/' + FLAGS.get_block
 
         r = requests.post(url_rpc, json.dumps(data_dict))
-        block_info =  get_data_part(r)
+        block_info = get_data_part(r)
         return block_info
 
     def request_recent_height(self):
@@ -50,10 +47,8 @@ class GetBytomDataAgent:
         except Exception, e:
             self.logger.error("Agent.GetBytomDataAgent request_recent_height ERROR:" + str(e))
             raise Exception("request_recent_height error: %s" % str(e))
-            return None
 
     def request_mongo_recent_height(self):
-        height = None
         try:
             state = self.mongo_cli.get(FLAGS.db_status, {})
 
@@ -73,7 +68,7 @@ class GetBytomDataAgent:
 
     def set_mongo_recent_height(self, height):
         try:
-            state = self.mongo_cli.update_one(FLAGS.db_status, {}, {'$set': {FLAGS.block_height: height}}, True)
+            self.mongo_cli.update_one(FLAGS.db_status, {}, {'$set': {FLAGS.block_height: height}}, True)
         except Exception, e:
             self.logger.error("Agent.GetBytomDataAgent set_mongo_recent_height ERROR:" + str(e))
             raise Exception("set_mongo_recent_height error: %s" % str(e))
@@ -115,8 +110,6 @@ class GetBytomDataAgent:
                         except Exception, e:
                             self.logger.error("Agent.GetBytomDataAgent sync_block ERROR:" + str(e))
                             raise Exception("sync_block error: %s" % str(e))
-
-
 
             time.sleep(self.sleep_time())
 
@@ -198,15 +191,12 @@ class GetBytomDataAgent:
         def info_abstract(mainchain_list):
             # pay attention to the change of block's keys
             block_info = mainchain_list
-
             address_info = []
-
             transaction_info = []
 
             for i, block in enumerate(mainchain_list) :
                 txs = block[FLAGS.transactions]
                 block_info[i][FLAGS.transactions] = []
-                
 
                 for j, tx in enumerate(txs):
                     block_info[i][FLAGS.transactions].append(tx[FLAGS.tx_id])
@@ -241,7 +231,6 @@ class GetBytomDataAgent:
                             }
                             address_info.append(address_info_element)
 
-
                     for txout in tx[FLAGS.transaction_out]:
                         if txout.has_key(FLAGS.address) and txout.has_key(FLAGS.asset_id) and txout.has_key(FLAGS.amount) and txout[FLAGS.amount] > 0 and txout.has_key(FLAGS.tx_o_id):
                             address_info_element = {
@@ -256,16 +245,11 @@ class GetBytomDataAgent:
                                 FLAGS.is_tx_in : False
                             }
                             address_info.append(address_info_element)
-                    
 
-                    
                     transaction_info.append(transaction_info_element)
 
+            return block_info, address_info, transaction_info
 
-            return (block_info, address_info, transaction_info)
-
-
-        
         (mainchain_list, height_record) = get_mainchainlist(block, recent_height)
 
         print 'Length of maichain block pending: '+str(len(mainchain_list))
@@ -293,7 +277,6 @@ class GetBytomDataAgent:
         self.logger.info('Obtain address info with '+str(len(address_info))+' txIO')
         self.logger.info('Adress info: '+str(address_info))
 
-        
         try:
             print 'UPDATING BLOCK DB'
             update_blockdb(block_info)
@@ -304,9 +287,6 @@ class GetBytomDataAgent:
             print 'UPDATING ADDRESS DB'
             update_addressdb(address_info)
             print 'END'
-
-
-
         except Exception, e:
             self.logger.error("Agent.GetBytomDataAgent update_db ERROR:" + str(e))
             raise Exception("update_db error: %s" % str(e))
