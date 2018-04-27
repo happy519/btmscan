@@ -1,6 +1,6 @@
 import sys
 from collector import agent
-from collector import flags
+from tools import flags
 
 FLAGS = flags.FLAGS
 

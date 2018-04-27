@@ -1,11 +1,10 @@
 import sys
-from constant import BYTOM_ASSET_ID
-from collector.db.mongodriver import MongodbClient
+from blockmeta.constant import BYTOM_ASSET_ID
+from blockmeta.db.mongo import MongodbClient
 
-from collector import flags
+from tools import flags
 
 FLAGS = flags.FLAGS
-
 
 
 class Asset_info:
@@ -62,7 +61,6 @@ def address_validation(addr):
     return True
 
 
-
 # class BuiltinDriver(base.Base):
 class BuiltinDriver():
     @property
@@ -92,14 +90,9 @@ class BuiltinDriver():
 
             return result
 
-
-        # try:
         if address_validation(addr) == False:
             raise Exception("address [%s] is not valid" % addr)
 
-        # def get_all(self, table, cond={}, items=None, n=0, sort_key=None, ascend=True, skip=0)
-        # consider situation of in main chain
-        # take care of the type casting betweent mongodb and python
         addr_data = self.mongo_cli.get_all(table=FLAGS.address_info, cond={FLAGS.address: addr})
         addr_info = abstract_info(addr_data)
         
@@ -108,10 +101,6 @@ class BuiltinDriver():
             addr_info[BYTOM_ASSET_ID] = Asset_info(addr=addr).get_info()
 
         return addr_info
-
-        # except Exception, e:
-        #     # self.logger.error("Address.BuiltinDriver request_address_info ERROR:" + str(e))
-        #     raise Exception("request_address_info error: %s" % str(e))   
 
 
 if __name__ == "__main__":

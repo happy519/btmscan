@@ -1,8 +1,7 @@
 #coding=utf-8
 
 from pymongo import MongoClient
-from collector import flags
-
+from tools import flags
 
 FLAGS = flags.FLAGS
 

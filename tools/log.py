@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
 sys.path.append('..')
 import os
-from collector import flags
+import flags
 import logging
 from logging.handlers import RotatingFileHandler
 
 FLAGS = flags.FLAGS
-
 
 
 def init_log(owner):
@@ -18,7 +18,6 @@ def init_log(owner):
         '%(asctime)s %(levelname)s <%(name)s>: %(message)s '
         '[in %(pathname)s:%(lineno)d]')
 
-    
     debug_log = os.path.join('.', FLAGS.DEBUG_LOG)
 
     debug_file_handler = RotatingFileHandler(debug_log, maxBytes=100000, backupCount=10)
@@ -44,6 +43,3 @@ def init_log(owner):
     logger.addHandler(sh)
 
     return logger
-
-
-
