@@ -32,3 +32,5 @@ gflags.DEFINE_string('transaction_in', 'inputs', '')
 gflags.DEFINE_string('transaction_out', 'outputs', '')
 gflags.DEFINE_string('txin_id', 'inputs.id', 'txin id')
 
+
+gflags.DEFINE_string('block_height', 'height', 'block height')
