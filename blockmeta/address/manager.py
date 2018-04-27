@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import sys
 from driver.bytom.builtin import BuiltinDriver
-import flags
+from collector import flags
+
 FLAGS = flags.FLAGS
 
 class AddressManager():

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from flask_restful import Api, Resource
-import address.api
+from flask_restful import Api
+import blockmeta.address.api
 
 #modules = [(handle, urls, args)]
 MODULES = [
     # address
-    (address.api.AddressAPI, ('/api/address/<string:addr_info>',), {'endpoint':'address'}),
+    (blockmeta.address.api.AddressAPI, ('/api/address/<string:addr_info>',), {'endpoint': 'address'}),
 ]
 
 

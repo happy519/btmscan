@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from manager import AddressManager
-from flask import Flask
-from flask_restful import reqparse, abort, Api, Resource
-import flags
-import sys
+from flask_restful import Resource
+from collector import flags
 
 FLAGS = flags.FLAGS        
 

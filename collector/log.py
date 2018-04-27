@@ -3,9 +3,8 @@
 
 import sys
 sys.path.append('..')
-import logging
 import os
-import flags
+from collector import flags
 import logging
 from logging.handlers import RotatingFileHandler
 

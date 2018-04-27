@@ -1,10 +1,9 @@
 import sys
 from constant import BYTOM_ASSET_ID
-from bson.objectid import ObjectId
-from db.mongodriver import MongodbClient
+from collector.db.mongodriver import MongodbClient
 
+from collector import flags
 
-import flags
 FLAGS = flags.FLAGS
 
 

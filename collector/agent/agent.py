@@ -4,9 +4,8 @@
 import requests
 import json
 from copy import deepcopy
-import flags
-from db.mongodriver import MongodbClient
-import log 
+from collector import flags, log
+from collector.db.mongodriver import MongodbClient
 import time
 
 # from rollback_test_data import BLOCK_A, BLOCK_A_00, BLOCK_A_01, BLOCK_A_02, BLOCK_A_10, BLOCK_A_11
