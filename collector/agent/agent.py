@@ -225,7 +225,7 @@ class GetBytomDataAgent:
 
                     for txin in tx[FLAGS.transaction_in]:
                         if txin[FLAGS.tx_io_type] == FLAGS.coinbase:
-                        	transaction_info_element[FLAGS.coinbase] = True
+                            transaction_info_element[FLAGS.coinbase] = True
 
                         if txin.has_key(FLAGS.address) and txin.has_key(FLAGS.asset_id) and txin.has_key(FLAGS.amount) and txin[FLAGS.amount] > 0 and txin.has_key(FLAGS.tx_i_id):
                             address_info_element = {
