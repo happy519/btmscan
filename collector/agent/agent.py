@@ -16,6 +16,8 @@ FLAGS = flags.FLAGS
 
 # need to save db height
 class GetBytomDataAgent:
+    sleep_time = 60
+
     def __init__(self):
         self.url_base = FLAGS.bytomd_rpc
 
@@ -74,41 +76,45 @@ class GetBytomDataAgent:
     def sync_all(self):
         while True and (self.mongo_recent_height is not None):
             recent_height = self.request_recent_height()
-            print 'recent_height: '+str(recent_height)
-            if recent_height is not None:
-                if recent_height < 0:
-                    self.logger.error("Agent.GetBytomDataAgent sync_all gets negative recent_height ERROR")
-                    raise Exception("sync_block get negative recent_height error")
+            print 'recent_height: ' + str(recent_height)
+            if recent_height is None:
+                time.sleep(self.sleep_time)
+                continue
 
-                else:
-                    self.logger.info('Recent block height in mainchain: '+str(recent_height)+'|| Recent block height in mongodb: '+str(self.mongo_recent_height))
+            if recent_height < 0:
+                self.logger.error("Agent.GetBytomDataAgent sync_all gets negative recent_height ERROR")
+                raise Exception("sync_block get negative recent_height error")
 
-                    while self.mongo_recent_height < recent_height:
-                        next_height = self.mongo_recent_height + 1
-                        block = self.request_block_info(next_height)
+            self.logger.info(
+                'Recent block height in mainchain: ' + str(recent_height) + '|| Recent block height in mongodb: ' + str(
+                    self.mongo_recent_height))
 
-                        # update mongodb
-                        try:
-                            self.logger.info('Syncing block: '+str(next_height))
-                            print 'Syncing block: '+str(next_height)
+            while self.mongo_recent_height < recent_height:
+                next_height = self.mongo_recent_height + 1
+                block = self.request_block_info(next_height)
 
-                            self.sync_block(block, recent_height)
-                            self.logger.info("Sync done: " + str(next_height))
-                            print "Sync done: " + str(next_height)
+                # update mongodb
+                try:
+                    self.logger.info('Syncing block: '+str(next_height))
+                    print 'Syncing block: '+str(next_height)
 
-                            self.logger.info("Updating block height in mongodb to "+str(next_height))
-                            print "Updating block height in mongodb to "+str(next_height)
-                            self.set_mongo_recent_height(next_height)
-                            self.logger.info("Update done!")
-                            print "Update done!"
-                            self.mongo_recent_height = next_height
+                    self.sync_block(block, recent_height)
+                    self.logger.info("Sync done: " + str(next_height))
+                    print "Sync done: " + str(next_height)
 
-                        # need to know how to deal with exception
-                        except Exception, e:
-                            self.logger.error("Agent.GetBytomDataAgent sync_block ERROR:" + str(e))
-                            raise Exception("sync_block error: %s" % str(e))
+                    self.logger.info("Updating block height in mongodb to "+str(next_height))
+                    print "Updating block height in mongodb to "+str(next_height)
+                    self.set_mongo_recent_height(next_height)
+                    self.logger.info("Update done!")
+                    print "Update done!"
+                    self.mongo_recent_height = next_height
 
-            time.sleep(self.sleep_time())
+                # need to know how to deal with exception
+                except Exception, e:
+                    self.logger.error("Agent.GetBytomDataAgent sync_block ERROR:" + str(e))
+                    raise Exception("sync_block error: %s" % str(e))
+
+            time.sleep(self.sleep_time)
 
     def rollback(self, block_height, block_num):
         self.set_mongo_recent_height(block_height-block_num)
@@ -281,11 +287,6 @@ class GetBytomDataAgent:
         except Exception, e:
             self.logger.error("Agent.GetBytomDataAgent update_db ERROR:" + str(e))
             raise Exception("update_db error: %s" % str(e))
-
-    @staticmethod
-    def sleep_time():
-        return 60
-
 
 def get_data_part(msg):
     r = msg.json()
