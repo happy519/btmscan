@@ -37,13 +37,11 @@ class DataAgent:
         return block_info
 
     def request_recent_height(self):
-        # block id: 0 - recent_height
         url_rpc = self.url_base + '/' + FLAGS.get_block_count
         try:
             r = requests.post(url_rpc)
             chain_height = get_data_part(r)
             return chain_height[FLAGS.block_count]
-
         except Exception, e:
             self.logger.error("Agent.GetBytomDataAgent request_recent_height ERROR:" + str(e))
             raise Exception("request_recent_height error: %s" % str(e))
@@ -93,22 +91,15 @@ class DataAgent:
                 next_height = self.mongo_recent_height + 1
                 block = self.request_block_info(next_height)
 
-                # update mongodb
                 try:
-                    self.logger.info('Syncing block: '+str(next_height))
-                    print 'Syncing block: '+str(next_height)
-
+                    self.logger.info('Syncing block: ' + str(next_height))
                     self.sync_block(block, recent_height)
                     self.logger.info("Sync done: " + str(next_height))
-                    print "Sync done: " + str(next_height)
 
-                    self.logger.info("Updating block height in mongodb to "+str(next_height))
-                    print "Updating block height in mongodb to "+str(next_height)
+                    self.logger.info("Updating block height in mongodb to " + str(next_height))
                     self.set_mongo_recent_height(next_height)
                     self.logger.info("Update done!")
-                    print "Update done!"
                     self.mongo_recent_height = next_height
-
                 # need to know how to deal with exception
                 except Exception, e:
                     self.logger.error("Agent.GetBytomDataAgent sync_block ERROR:" + str(e))
@@ -273,18 +264,13 @@ class DataAgent:
         self.logger.info('Adress info: '+str(address_info))
 
         try:
-            print 'UPDATING BLOCK DB'
             update_blockdb(block_info)
-            print 'END'
-            print 'UPDATING TRANSACTION DB'
             update_transactiondb(transaction_info)
-            print 'END'
-            print 'UPDATING ADDRESS DB'
             update_addressdb(address_info)
-            print 'END'
         except Exception, e:
             self.logger.error("Agent.GetBytomDataAgent update_db ERROR:" + str(e))
             raise Exception("update_db error: %s" % str(e))
+
 
 def get_data_part(msg):
     r = msg.json()
