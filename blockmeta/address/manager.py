@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from driver.bytom.builtin import BuiltinDriver
-from collector import flags
+from tools import flags
 
 FLAGS = flags.FLAGS
 
@@ -20,7 +20,6 @@ class AddressManager():
             return addr_info
 
         except Exception, e:
-            
             raise Exception("handle_address error: %s", e)   
 
 if __name__ == '__main__':
