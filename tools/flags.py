@@ -49,7 +49,7 @@ gflags.DEFINE_string('tx_id', 'id', '')
 gflags.DEFINE_string('is_tx_in', 'is_tx_in', '')
 gflags.DEFINE_string('data', 'data', '')
 gflags.DEFINE_string('tx_io_id', 'tx_io_id', '')
-
+gflags.DEFINE_string('size', 'size', '')
 
 # log
 gflags.DEFINE_string('DEBUG_LOG', 'logs/debug.log', 'location')

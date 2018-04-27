@@ -7,8 +7,8 @@ from tools import flags
 FLAGS = flags.FLAGS
 
 
-class Asset_info:
-    def __init__(self, balance = 0, recv = 0, tx_num = 0, addr = ''):
+class AssetInfo:
+    def __init__(self, balance=0, recv=0, tx_num=0, addr = ''):
         self.info = {}
         self.info['balance'] = int(balance)
         self.info['recv'] = int(recv)
@@ -32,7 +32,6 @@ class Asset_info:
             'addr': self.info['addr'],
             'txnum' : len(txs_list),
             'txs': txs_list
-
         }
 
         return info
@@ -80,7 +79,7 @@ class BuiltinDriver():
             addr_info = {}
             for addr_data_element in addr_data:
                 if addr_data_element[FLAGS.asset_id] not in addr_info.keys():
-                    addr_info[addr_data_element[FLAGS.asset_id]] = Asset_info()
+                    addr_info[addr_data_element[FLAGS.asset_id]] = AssetInfo()
                 addr_info[addr_data_element[FLAGS.asset_id]].update(addr_data_element)
 
             
@@ -98,7 +97,7 @@ class BuiltinDriver():
         
         # show BYTOM default
         if BYTOM_ASSET_ID not in addr_info.keys():
-            addr_info[BYTOM_ASSET_ID] = Asset_info(addr=addr).get_info()
+            addr_info[BYTOM_ASSET_ID] = AssetInfo(addr=addr).get_info()
 
         return addr_info
 

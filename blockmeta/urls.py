@@ -7,7 +7,10 @@ import blockmeta.tx.api
 MODULES = [
     # address
     (blockmeta.address.api.AddressAPI, ('/api/address/<string:addr_info>',), {'endpoint': 'address'}),
+
+    # tx
     (blockmeta.tx.api.TxAPI, ('/api/tx/<string:tx_hash>',), {'endpoint': 'tx'}),
+    (blockmeta.tx.api.TxListAPI, ('/api/txs',), {'endpoint': 'txs'}),
 ]
 
 

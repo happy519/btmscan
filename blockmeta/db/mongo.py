@@ -43,9 +43,8 @@ class MongodbClient:
             return collection
 
     def get_last_n(self, table, args, order, n):
-        res = self.mc[table].find(args).sort(order, -1).skip(n).limit(1)
-        rlist = list(res)
-        return rlist[0] if rlist else None
+        res = self.mc[table].find(args).sort(order, -1).limit(n)
+        return res if res else None
 
     def get_one(self, table, cond):
         res = self.mc[table].find_one(cond)
