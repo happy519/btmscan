@@ -8,7 +8,7 @@ FLAGS = flags.FLAGS
 
 
 class AssetInfo:
-    def __init__(self, balance=0, recv=0, tx_num=0, addr = ''):
+    def __init__(self, balance=0, recv=0, addr=''):
         self.info = {}
         self.info['balance'] = int(balance)
         self.info['recv'] = int(recv)
@@ -37,7 +37,6 @@ class AssetInfo:
         return info
 
     def update(self, address_info_element):
-
         delta = int(address_info_element[FLAGS.amount])
         if address_info_element[FLAGS.is_tx_in]:
             delta = -delta
@@ -56,6 +55,7 @@ class AssetInfo:
                 'balance_change': delta
             }
 
+
 def address_validation(addr):
     return True
 
@@ -72,7 +72,6 @@ class BuiltinDriver():
 
         # to do : authentication is needed
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
-
     
     def request_address_info(self, addr):
         def abstract_info(addr_data):

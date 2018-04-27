@@ -12,7 +12,9 @@ def is_hash_prefix(s):
         s = s[2:]
     return HASH_PREFIX_RE.match(s) and len(s) >= HASH_PREFIX_MIN
 
+
 def from_hex(x):
     return None if x is None else x.decode('hex')
+
 
 hashin_hex  = from_hex

@@ -2,6 +2,7 @@
 from flask_restful import Api
 import blockmeta.address.api
 import blockmeta.tx.api
+import blockmeta.block.api
 
 #modules = [(handle, urls, args)]
 MODULES = [
@@ -11,6 +12,10 @@ MODULES = [
     # tx
     (blockmeta.tx.api.TxAPI, ('/api/tx/<string:tx_hash>',), {'endpoint': 'tx'}),
     (blockmeta.tx.api.TxListAPI, ('/api/txs',), {'endpoint': 'txs'}),
+
+    #block
+    (blockmeta.block.BlockAPI,         ('/api/block/<string:block_info>',),    {'endpoint': 'block'}),
+    (blockmeta.block.BlockListAPI,     ('/api/blocks',),                       {'endpoint': 'blocks'}),
 ]
 
 
