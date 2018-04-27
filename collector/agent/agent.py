@@ -73,7 +73,6 @@ class GetBytomDataAgent:
 
     def sync_all(self):
         while True and (self.mongo_recent_height is not None):
-
             recent_height = self.request_recent_height()
             print 'recent_height: '+str(recent_height)
             if recent_height is not None:
@@ -129,7 +128,6 @@ class GetBytomDataAgent:
             
             print "---------------------------XX------------------------------"
 
-
         def update_addressdb(address_info):
             # if same address_info exists, cover it; else insert
             # if forked address_info exists, mark it as forked
@@ -139,7 +137,6 @@ class GetBytomDataAgent:
                 self.mongo_cli.insert_one(FLAGS.address_info, address_info_element)
                 self.logger.info('Insert done!')
             print "---------------------------XX-------------------------------"
-
 
         def update_transactiondb(transaction_info):
             # if block_info exist, cover it; else insert
@@ -154,8 +151,6 @@ class GetBytomDataAgent:
 
 
         def get_mainchainlist(block, recent_height):
-        
-
             block_height = block[FLAGS.block_height]
             height_record = block_height
             mainchain_list = [block]
@@ -170,8 +165,6 @@ class GetBytomDataAgent:
 
                 # Can use != directly?
                 while prevblock_db_hash is None or prevblock_db_hash != prevblock_hash :
-                    
-
                     # for test
                     block = self.request_block_info(block_height)
                     mainchain_list.append(block)
