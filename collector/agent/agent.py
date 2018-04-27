@@ -29,13 +29,16 @@ class DataAgent:
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
         self.mongo_recent_height = self.request_mongo_recent_height()
 
-    def request_block_info(self, block_height):
-        data_dict = {FLAGS.get_block_height_arg: block_height}
-        url_rpc = self.url_base + '/' + FLAGS.get_block
+    def request_block(self, block_height):
+        params = json.dumps({FLAGS.get_block_height_arg: block_height})
+        url = '/'.join([self.url_base, FLAGS.get_block])
 
-        r = requests.post(url_rpc, json.dumps(data_dict))
-        block_info = get_data_part(r)
-        return block_info
+        try:
+            response = requests.post(url, params)
+            # TODO: check fail status
+            return get_data_part(response)
+        except Exception, e:
+            raise Exception('get block error: %s', e)
 
     def request_recent_height(self):
         url_rpc = self.url_base + '/' + FLAGS.get_block_count
@@ -78,7 +81,7 @@ class DataAgent:
 
             while self.mongo_recent_height < recent_height:
                 next_height = self.mongo_recent_height + 1
-                block = self.request_block_info(next_height)
+                block = self.request_block(next_height)
 
                 try:
                     self.logger.info('Syncing block: ' + str(next_height))
@@ -150,7 +153,7 @@ class DataAgent:
                 # Can use != directly?
                 while prevblock_db_hash is None or prevblock_db_hash != prevblock_hash :
                     # for test
-                    block = self.request_block_info(block_height)
+                    block = self.request_block(block_height)
                     mainchain_list.append(block)
 
                     block_height -= 1
