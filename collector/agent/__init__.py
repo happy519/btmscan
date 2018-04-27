@@ -1,1 +1,1 @@
-from agent import GetBytomDataAgent
+from agent import DataAgent

@@ -15,7 +15,7 @@ FLAGS = flags.FLAGS
 
 
 # need to save db height
-class GetBytomDataAgent:
+class DataAgent:
     sleep_time = 60
 
     def __init__(self):
@@ -153,8 +153,6 @@ class GetBytomDataAgent:
                 self.mongo_cli.insert_one(FLAGS.transaction_info, transaction_info_element)
 
             print "---------------------------XX------------------------------"
-
-
 
         def get_mainchainlist(block, recent_height):
             block_height = block[FLAGS.block_height]
