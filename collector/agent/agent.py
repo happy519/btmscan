@@ -74,14 +74,9 @@ class DataAgent:
     def sync_all(self):
         while True and (self.mongo_recent_height is not None):
             recent_height = self.request_recent_height()
-            print 'recent_height: ' + str(recent_height)
             if recent_height is None:
                 time.sleep(self.sleep_time)
                 continue
-
-            if recent_height < 0:
-                self.logger.error("Agent.GetBytomDataAgent sync_all gets negative recent_height ERROR")
-                raise Exception("sync_block get negative recent_height error")
 
             self.logger.info(
                 'Recent block height in mainchain: ' + str(recent_height) + '|| Recent block height in mongodb: ' + str(
