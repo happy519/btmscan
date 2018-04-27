@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 
 import json
 import time
@@ -78,8 +78,8 @@ class GetBytomDataAgent:
             print 'recent_height: '+str(recent_height)
             if recent_height is not None:
                 if recent_height < 0:
-                    self.logger.error("Agent.GetBytomDataAgent sync_all gets negative recent_height ERROR:" + str(e))
-                    raise Exception("sync_block get negative recent_height error: %s" % str(e))
+                    self.logger.error("Agent.GetBytomDataAgent sync_all gets negative recent_height ERROR")
+                    raise Exception("sync_block get negative recent_height error")
 
                 else:
                     self.logger.info('Recent block height in mainchain: '+str(recent_height)+'|| Recent block height in mongodb: '+str(self.mongo_recent_height))
@@ -289,22 +289,11 @@ class GetBytomDataAgent:
             self.logger.error("Agent.GetBytomDataAgent update_db ERROR:" + str(e))
             raise Exception("update_db error: %s" % str(e))
 
-
-    def sleep_time(self):
+    @staticmethod
+    def sleep_time():
         return 60
 
 
 def get_data_part(msg):
     r = msg.json()
     return r[FLAGS.data]
-
-# def print_transaction(tx):
-# 	print '-------------------'
-# 	print 'block_id: '+str(tx[FLAGS.block_id])
-# 	print 'tx_id: '+str(tx[FLAGS.tx_id])
-# 	print 'height: '+str(tx[FLAGS.block_height])
-# 	print 'coinbase: '+str(tx[FLAGS.coinbase])
-# 	print '-------------------'
-
-
-
