@@ -1,4 +1,5 @@
 import sys
+
 from collector import agent
 from tools import flags
 

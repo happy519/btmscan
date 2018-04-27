@@ -4,9 +4,11 @@
 import json
 import time
 from copy import deepcopy
+
 import requests
-from tools import flags, log
+
 from collector.db.mongodriver import MongodbClient
+from tools import flags, log
 
 # from rollback_test_data import BLOCK_A, BLOCK_A_00, BLOCK_A_01, BLOCK_A_02, BLOCK_A_10, BLOCK_A_11
 FLAGS = flags.FLAGS
@@ -24,7 +26,6 @@ class DataAgent:
         self.logger = log.init_log('agent')
         self.mongo_cli = MongodbClient(host=FLAGS.mongo_bytom_host, port=FLAGS.mongo_bytom_port)
 
-        # to do : authentication is needed
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
         self.mongo_recent_height = self.request_mongo_recent_height()
 
@@ -49,20 +50,9 @@ class DataAgent:
     def request_mongo_recent_height(self):
         try:
             state = self.mongo_cli.get(FLAGS.db_status, {})
-
-            if state is None:
-                # self.mongo_recent_height = -1
-                height = -1
-
-            else:
-                height = state[FLAGS.block_height]
-                # print "ok! " + str(self.mongo_recent_height)
-
+            return None if state is None else state[FLAGS.block_height]
         except Exception, e:
-            self.logger.error("Agent.GetBytomDataAgent request_mongo_recent_height ERROR:" + str(e))
             raise Exception("request_mongo_recent_height error: %s" % str(e))
-
-        return height
 
     def set_mongo_recent_height(self, height):
         try:
@@ -72,7 +62,11 @@ class DataAgent:
             raise Exception("set_mongo_recent_height error: %s" % str(e))
 
     def sync_all(self):
-        while True and (self.mongo_recent_height is not None):
+        if self.mongo_recent_height is None:
+            # TODO: request the block whose height is 0
+            pass
+
+        while True:
             recent_height = self.request_recent_height()
             if recent_height is None:
                 time.sleep(self.sleep_time)
