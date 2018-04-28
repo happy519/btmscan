@@ -33,6 +33,8 @@ class MongodbClient:
     def insert(self, table, value):
         self.mc[table].insert(value)
 
+    def insert_many(self, table, value_list):
+        self.mc[table].insert_many(value_list)
 
     def get_all(self, table, cond={}, items=None, n=0, sort_key=None, ascend=True, skip=0):
         collection = self.mc[table].find(cond, items) if items else self.mc[table].find(cond)
