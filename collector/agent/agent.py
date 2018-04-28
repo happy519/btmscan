@@ -1,53 +1,56 @@
 #! /usr/bin/env python
 # coding=utf-8
-
 import time
 
-from collector.agent.fetcher import Fetcher
-from collector.db.mongodriver import MongodbClient
-from tools import flags, log
 from collector.agent.db_proxy import DbProxy
+from collector.agent.fetcher import Fetcher
+from tools import flags
 
 FLAGS = flags.FLAGS
 
 
 class DataAgent:
-    sleep_time = 60
+    ONE_MINUTE = 60
 
     def __init__(self):
+        print 'fuck init'
         self.url_base = FLAGS.bytomd_rpc
         self.fetcher = Fetcher()
         self.proxy = DbProxy()
+        self.height = self.proxy.get_height()
 
-        self.logger = log.init_log('agent')
-        self.mongo_cli = MongodbClient(host=FLAGS.mongo_bytom_host, port=FLAGS.mongo_bytom_port)
+    def request_genesis_block(self):
+        genesis = self.fetcher.request_block(0)
+        self.proxy.save_block(genesis)
 
-        self.mongo_cli.use_db(FLAGS.mongo_bytom)
-        self.mongo_recent_height = self.proxy.get_height()
+    def sync(self):
+        if self.height is None:
+            self.request_genesis_block()
 
-    def sync_all(self):
-        if self.mongo_recent_height is None:
-            # TODO: request the block whose height is 0
-            pass
+        self.roll_back()
+        node_height = self.fetcher.request_chain_height()
+        while self.height < node_height:
+            node_block = self.fetcher.request_block(self.height + 1)
+            pre_block_in_db = self.proxy.get_block_by_height(self.height)
 
+            if node_block['previous_block_hash'] != pre_block_in_db['hash']:
+                break
+
+            self.proxy.save_block(node_block)
+            self.height = node_block['height']
+
+    def roll_back(self):
+        while self.height > 0:
+            db_block = self.proxy.get_block_by_height(self.height)
+            node_block = self.fetcher.request_block(self.height)
+            if db_block['hash'] == node_block['hash']:
+                return
+
+            self.proxy.set_height(self.height - 1)
+            self.height -= 1
+
+    def sync_forever(self):
+        print 'fuck'
         while True:
-            recent_height = self.fetcher.request_chain_height()
-            if recent_height is None:
-                time.sleep(self.sleep_time)
-                # TODO: request and save the block whose height is 0
-                continue
-
-            while self.mongo_recent_height < recent_height:
-                # TODO: find the sync begining height
-                next_height = self.mongo_recent_height + 1
-                block = self.fetcher.request_block(next_height)
-
-                try:
-                    self.sync_block(block, recent_height)
-                    self.proxy.set_height(next_height)
-                    self.mongo_recent_height = next_height
-                except Exception, e:
-                    self.logger.error("Agent.GetBytomDataAgent sync_block ERROR:" + str(e))
-                    raise Exception("sync_block error: %s" % str(e))
-
-            time.sleep(self.sleep_time)
+            self.sync()
+            time.sleep(self.ONE_MINUTE)
