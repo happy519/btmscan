@@ -1,11 +1,9 @@
 #! /usr/bin/env python
 # coding=utf-8
 
-import json
 import time
 
-import requests
-
+from collector.agent.fetcher import Fetcher
 from collector.db.mongodriver import MongodbClient
 from tools import flags, log
 
@@ -21,33 +19,13 @@ class DataAgent:
 
     def __init__(self):
         self.url_base = FLAGS.bytomd_rpc
+        self.fetcher = Fetcher()
 
         self.logger = log.init_log('agent')
         self.mongo_cli = MongodbClient(host=FLAGS.mongo_bytom_host, port=FLAGS.mongo_bytom_port)
 
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
         self.mongo_recent_height = self.request_mongo_recent_height()
-
-    def request_block(self, block_height):
-        params = json.dumps({FLAGS.get_block_height_arg: block_height})
-        url = '/'.join([self.url_base, FLAGS.get_block])
-
-        try:
-            response = requests.post(url, params)
-            # TODO: check fail status
-            return get_data_part(response)
-        except Exception, e:
-            raise Exception('get block error: %s', e)
-
-    def request_recent_height(self):
-        url_rpc = self.url_base + '/' + FLAGS.get_block_count
-        try:
-            r = requests.post(url_rpc)
-            chain_height = get_data_part(r)
-            return chain_height[FLAGS.block_count]
-        except Exception, e:
-            self.logger.error("Agent.GetBytomDataAgent request_recent_height ERROR:" + str(e))
-            raise Exception("request_recent_height error: %s" % str(e))
 
     def request_mongo_recent_height(self):
         try:
@@ -69,7 +47,7 @@ class DataAgent:
             pass
 
         while True:
-            recent_height = self.request_recent_height()
+            recent_height = self.fetcher.request_chain_height()
             if recent_height is None:
                 time.sleep(self.sleep_time)
                 # TODO: request and save the block whose height is 0
@@ -78,7 +56,7 @@ class DataAgent:
             while self.mongo_recent_height < recent_height:
                 # TODO: find the sync begining height
                 next_height = self.mongo_recent_height + 1
-                block = self.request_block(next_height)
+                block = self.fetcher.request_block(next_height)
 
                 try:
                     self.sync_block(block, recent_height)
