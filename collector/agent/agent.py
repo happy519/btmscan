@@ -83,12 +83,8 @@ class DataAgent:
 
                 try:
                     self.sync_block(block, recent_height)
-
-                    self.logger.info("Updating block height in mongodb to " + str(next_height))
                     self.set_mongo_recent_height(next_height)
-                    self.logger.info("Update done!")
                     self.mongo_recent_height = next_height
-                # need to know how to deal with exception
                 except Exception, e:
                     self.logger.error("Agent.GetBytomDataAgent sync_block ERROR:" + str(e))
                     raise Exception("sync_block error: %s" % str(e))

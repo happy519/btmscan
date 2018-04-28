@@ -1,0 +1,35 @@
+import json
+
+import requests
+
+from tools import flags
+
+
+# fetch info from bytomd
+class Fetcher:
+    def __init__(self):
+        self.url_base = flags.FLAGS.bytomd_rpc
+
+    def request_block(self, block_height):
+        params = json.dumps({flags.FLAGS.get_block_height_arg: block_height})
+        url = '/'.join([self.url_base, flags.FLAGS.get_block])
+
+        try:
+            response = requests.post(url, params).json()
+            if response['status'] == 'fail':
+                raise Exception('get block failed: %s', response['msg'])
+
+            return response['data']
+        except Exception, e:
+            raise Exception('get block error: %s', e)
+
+    def request_chain_height(self):
+        url = '/'.join([self.url_base, flags.FLAGS.get_block_count])
+        try:
+            response = requests.post(url).json()
+            if response['status'] == 'fail':
+                raise Exception('get chain height failed: %s', response['msg'])
+
+            return response['data'][flags.FLAGS.block_count]
+        except Exception, e:
+            raise Exception('get chain height failed: %s', e)
