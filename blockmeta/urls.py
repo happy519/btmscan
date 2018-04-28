@@ -14,8 +14,8 @@ MODULES = [
     (blockmeta.tx.api.TxListAPI, ('/api/txs',), {'endpoint': 'txs'}),
 
     #block
-    (blockmeta.block.BlockAPI,         ('/api/block/<string:block_info>',),    {'endpoint': 'block'}),
-    (blockmeta.block.BlockListAPI,     ('/api/blocks',),                       {'endpoint': 'blocks'}),
+    (blockmeta.block.api.BlockAPI, ('/api/block/<string:block_id>',), {'endpoint': 'block'}),
+    (blockmeta.block.api.BlockListAPI, ('/api/blocks',), {'endpoint': 'blocks'}),
 ]
 
 

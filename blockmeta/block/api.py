@@ -6,6 +6,7 @@ from flask.ext.restful import Resource
 
 from tools import flags
 from manager import BlockManager
+from blockmeta.constant import DEFAULT_OFFSET
 
 FLAGS = flags.FLAGS
 
@@ -13,18 +14,19 @@ FLAGS = flags.FLAGS
 class BlockAPI(Resource):
 
     def __init__(self):
-        self.manager = TxManager()
+        self.manager = BlockManager()
 
-    def get(self, tx_hash):
-        result = self.manager.handle_tx(tx_hash) if tx_hash else {}
+    def get(self, block_id):
+        print ("=======>>>>>>>>>>>>>>>>>>>>>"), block_id
+        result = self.manager.handle_block(block_id) if block_id else {}
         return result
 
 
-class TxListAPI(Resource):
+class BlockListAPI(Resource):
 
     def __init__(self):
-        self.manager = TxManager()
+        self.manager = BlockManager()
 
-    def get(self, num):
-        result = self.manager.list_txs(num)
+    def get(self, num=DEFAULT_OFFSET):
+        result = self.manager.list_blocks(num)
         return result

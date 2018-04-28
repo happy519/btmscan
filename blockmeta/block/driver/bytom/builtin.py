@@ -2,119 +2,118 @@
 # -*- coding: utf-8 -*-
 
 from tools import flags, exception
-from blockmeta.tools.bytom import *
+from blockmeta.tools.bytom import is_hash_prefix, remove_0x
 from blockmeta.db.mongo import MongodbClient
-from blockmeta import constant
+from blockmeta.constant import DEFAULT_OFFSET
 
 FLAGS = flags.FLAGS
 
 
-
-
-# class Block_info():
-#     def __init__(self, block_data):
-#         reward = 41250000000.0
-#         height = block_data[FLAGS.block_height]
-#         n = min(height / 840000, 36)
-#         for i in range(n):
-#             reward /= 2
-#
-#         self.info = {
-#             'pow': 1,
-#             'hash': block_data[FLAGS.block_id],
-#             'prev_block_hash': block_data[FLAGS.prev_block_hash] if block_data[FLAGS.block_height] != 0 else '',
-#             'title': 'bytom'
-#             'height': block_data[FLAGS.height],
-#             'version': block_data[FLAGS.version],
-#             'transaction_merkle_root': block_data[FLAGS.transaction_merkle_root],
-#             'transaction_status_root':
-#             block_data[FLAGS.transaction_status_root],
-#             'time': block_data[FLAGS.timestamp],
-#             'difficulty': block_data[FLAGS.difficulty],
-#             'nbits': block_data[FLAGS.bits],
-#             'relay': '',
-#             'nonuce': block_data[
-#                 FLAGS.nonuce],
-#             'tx_num': len(block_data[FLAGS.transactions]),
-#             'reward': reward,
-#             'main': True,
-#             'size':
-#             block_data[FLAGS.block_size],
-#             'tx': block_data[FLAGS.transactions],
-#         }
-#
-#         get_info(self):
-#         return self.info
-
-
-# def block_validation(block_id, block_height):
-#     return True
-
-
-class BuiltinDriver(base.Base):
+class BuiltinDriver:
     @property
     def type(self):
-        return 'bytom_builtin'
+        return 'builtin'
 
     def __init__(self):
-
         self.mongo_cli = MongodbClient(
             host=FLAGS.mongo_bytom_host,
             port=FLAGS.mongo_bytom_port)
-
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
 
-    def request_block_info(self, b_height=None, b_hash=None, start, offset, chain_id=1, basic=True):
-        def abstract_info(block_data, chain):
-            block_basic_info = Block_info(block_data, chain)
-            return block_basic_info.get_info()
-
+    def request_block_info(self, arg):
         try:
-            if block_validation(b_height, b_hash) == False:
-                raise Exception("address [%s] is not valid" % addr)
-
-            # def get_all(self, table, cond={}, items=None, n=0, sort_key=None, ascend=True, skip=0)
-            # consider situation of in main chain
-            # take care of the type casting betweent mongodb and python
-
-            block_data = {}
-            if block_id is not None:
-                block_data = self.mongo_cli.get_one(
-                    table=FLAGS.block_info, cond={
-                        FLAGS.block_id: block_id})
+            block_id = remove_0x(arg)
+            if len(block_id) == 64:
+                block_info = self.get_block_by_hash(block_id)
             else:
-                block_data = self.mongo_cli.get_one(
-                    table=FLAGS.block_info, cond={
-                        FLAGS.block_height: block_height})
+                block_info = self.get_block_by_height(block_id)
 
-            block_basic_info = abstract_info(
-                block_data, chain) if block_data else {}
-
-            if basic:
-                block_info = block_basic_info
-
-            else:
-                pass
-                # get info of relevent transaction
-                # 'values':           format_satoshis(value_out, chain),
-                # 'tx_fees':          format_satoshis(block_fees, chain),
-
-            return block_info
-
-        except Exception, e:
-            self.logger.error(
-                "Block.BuiltinDriver.request_block_info Error: %s" %
-                str(e))
+        except Exception as e:
             raise Exception("request_block_info error: %s", e)
+        return block_info
 
-    def list_blocks(self, start, offset):
+    def list_blocks(self, offset=DEFAULT_OFFSET):
+        try:
+            block_list = []
+            blocks = self.get_block_latest_in_range(offset)
+            for block in blocks:
+                block_info = self._show_block(block)
+                block_list.append(block_info)
 
-        block_list = []
-        blocks = self.mongo_cli.block_get_latest_in_range(
-            start, DEFAULT_OFFSET)
-        for block in blocks:
-            block_info = Block_info(block).get_info()
+        except Exception as e:
+            raise Exception("list_blocks error: %s", e)
+        return block_list
 
-            block_list.append(block_info)
+    def get_block_by_height(self, height):
+        try:
+            if int(height) < 0:
+                raise Exception("Block height is wrong!")
+            block = self.mongo_cli.get_one(
+                table=FLAGS.block_info, cond={
+                    FLAGS.block_height: int(height)})
+            if block is None:
+                raise Exception("Block not found!")
+            block_info = self._show_block(block)
 
-        return block_list, block_list[0]['height'] + 1
+        except Exception as e:
+            raise exception.DBError(e)
+        return block_info
+
+    def get_block_by_hash(self, blockhash):
+        try:
+            if not is_hash_prefix(blockhash):
+                raise Exception("Block hash is wrong!")
+            block = self.mongo_cli.get_one(
+                table=FLAGS.block_info, cond={
+                    FLAGS.block_id: blockhash})
+            if block is None:
+                raise Exception("Block not found!")
+            block_info = self._show_block(block)
+        except Exception as e:
+            raise exception.DBError(e)
+        return block_info
+
+    def get_block_latest_in_range(self, offset):
+        try:
+            blocks = self.mongo_cli.get_last_n(
+                table=FLAGS.block_info,
+                args=None,
+                order=FLAGS.block_height,
+                n=offset)
+        except Exception as e:
+            raise exception.DBError(e)
+        return blocks
+
+    def _show_block(self, block):
+        '''
+        format conversion
+        convert to the block message that user see
+        :param block: block from db
+        :return:
+        '''
+        block_info = {}
+        block_height = block.get(FLAGS.block_height)
+        block_hash = block.get(FLAGS.block_id)
+        block_version = block.get(FLAGS.version)
+        pre_block_hash = block.get(FLAGS.previous_block_hash)
+        tx_merkle_root = block.get(FLAGS.merkle_root)
+        nonce = block.get(FLAGS.nonce)
+        timestamp = block.get(FLAGS.timestamp)
+        difficulty = block.get(FLAGS.difficulty)
+        nbit = block.get(FLAGS.block_nbit)
+        transactions = block.get(FLAGS.transactions)
+        block_size = block.get(FLAGS.block_size)
+
+        block_info['block_height'] = block_height
+        block_info['block_hash'] = block_hash
+        block_info['block_version'] = block_version
+        block_info['pre_block_hash'] = pre_block_hash
+        block_info['tx_merkle_root'] = tx_merkle_root
+        block_info['nonce'] = nonce
+        block_info['timestamp'] = timestamp
+        block_info['difficulty'] = difficulty
+        block_info['nbit'] = nbit
+        block_info['transactions'] = transactions
+        block_info['block_size'] = block_size
+
+        return block_info

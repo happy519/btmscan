@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import gflags
 FLAGS = gflags.FLAGS
-
 
 
 # agent
@@ -39,6 +39,14 @@ gflags.DEFINE_string('block_count', 'block_count', '')
 gflags.DEFINE_string('address', 'address', '')
 gflags.DEFINE_string('block_id', 'hash', '')
 gflags.DEFINE_string('previous_block_hash', 'previous_block_hash', '')
+gflags.DEFINE_string('merkle_root', 'transaction_merkle_root', '')
+gflags.DEFINE_string('nonce', 'nonce', '')
+gflags.DEFINE_string('timestamp', 'timestamp', '')
+gflags.DEFINE_string('difficulty', 'difficulty', '')
+gflags.DEFINE_string('block_nbit', 'bits', '')
+gflags.DEFINE_string('block_size', 'size', '')
+
+
 gflags.DEFINE_string('transactions', 'transactions', '')
 gflags.DEFINE_string('transaction_in', 'inputs', '')
 gflags.DEFINE_string('transaction_out', 'outputs', '')
@@ -50,10 +58,13 @@ gflags.DEFINE_string('is_tx_in', 'is_tx_in', '')
 gflags.DEFINE_string('data', 'data', '')
 gflags.DEFINE_string('tx_io_id', 'tx_io_id', '')
 gflags.DEFINE_string('size', 'size', '')
+gflags.DEFINE_string('tx_fee', 'fee', '')
+
+
+gflags.DEFINE_string('version', 'version', '')
 
 # log
 gflags.DEFINE_string('DEBUG_LOG', 'logs/debug.log', 'location')
 gflags.DEFINE_string('ERROR_LOG', 'logs/error.log', 'location')
 gflags.DEFINE_string('INFO_LOG', 'logs/info.log', 'location')
-
 
