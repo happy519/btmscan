@@ -73,20 +73,16 @@ class DataAgent:
             recent_height = self.request_recent_height()
             if recent_height is None:
                 time.sleep(self.sleep_time)
+                # TODO: request and save the block whose height is 0
                 continue
 
-            self.logger.info(
-                'Recent block height in mainchain: ' + str(recent_height) + '|| Recent block height in mongodb: ' + str(
-                    self.mongo_recent_height))
-
             while self.mongo_recent_height < recent_height:
+                # TODO: find the sync begining height
                 next_height = self.mongo_recent_height + 1
                 block = self.request_block(next_height)
 
                 try:
-                    self.logger.info('Syncing block: ' + str(next_height))
                     self.sync_block(block, recent_height)
-                    self.logger.info("Sync done: " + str(next_height))
 
                     self.logger.info("Updating block height in mongodb to " + str(next_height))
                     self.set_mongo_recent_height(next_height)
