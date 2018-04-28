@@ -16,3 +16,8 @@ def remove_0x(s):
     if s.startswith("0x"):
         s = s[2:]
     return s
+
+
+def format_bytom_neu(value):
+    btm = long(value) / (10 ** 8)
+    return btm

@@ -13,10 +13,7 @@ class AddressAPI(Resource):
     def __init__(self):
         self.manager = AddressManager()
 
-    def get(self, addr_info=None):
+    def get(self, address):
         
-        result = self.manager.handle_address(addr_info) if addr_info else {}    
+        result = self.manager.handle_address(address) if address else {}
         return result
-
-
-
