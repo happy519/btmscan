@@ -21,9 +21,6 @@ TOP_N = 10
 
 # address api
 FILTERS = ['all', 'sent', 'recv', 'unspent', 'unconfirmed', 'confirmed']
-# ethereum address part
-#(1) addr
-FILTERS = FILTERS + ['tx', 'holder', 'mine', 'internaltx', 'uncles', 'source']
 
 
 FILTER_CONFIRMED ='confirmed'
@@ -60,25 +57,12 @@ DEFAULT_ARCHIVES_DISPLAY = 30
 EXPIRE_CAPTCHA =  60
 
 #Bitcoin
-BTC_IN_SATOSHIS = 10 ** 8
 TX_HASH_LEN = 64
 HASHRATE_PER_P = 1024 * 1024 * 1024 * 1024 * 1024
 
-# ethereum reward
-BLOCK_REWARD = 5
-UNCLE_REWARD = 5 * 1.0 / 32
-# token demicals
+
 
 # chain type
-BITCOIN="bitcoin"
-ETHEREUM="ethereum"
-ETHEREUMCLASSIC="ethereumclassic"
 BYTOM="bytom"
 
-
-METHOD_ETH_GET_BALANCE = "eth_getBalance"
-METHOD_ETH_GET_NUMBER = "eth_blockNumber"
-
-
-
-
+BYTOM_ASSET_ID = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"

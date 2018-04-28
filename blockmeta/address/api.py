@@ -3,7 +3,7 @@
 
 from manager import AddressManager
 from flask_restful import Resource
-from collector import flags
+from tools import flags
 
 FLAGS = flags.FLAGS        
 

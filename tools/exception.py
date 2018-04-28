@@ -1,8 +1,4 @@
 
-import logging
-from flask import current_app
-
-LOG = current_app.logger
 
 class Error(Exception):
     def __init__(self, message=None):
@@ -41,6 +37,3 @@ class DBError(Error):
     def __init__(self, inner_exception):
         self.inner_exception = inner_exception
         super(DBError, self).__init__(str(inner_exception))
-
-
-

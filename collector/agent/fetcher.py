@@ -1,29 +1,35 @@
+import json
+
+import requests
+
+from tools import flags
 
 
+# fetch info from bytomd
+class Fetcher:
+    def __init__(self):
+        self.url_base = flags.FLAGS.bytomd_rpc
 
+    def request_block(self, block_height):
+        params = json.dumps({flags.FLAGS.get_block_height_arg: block_height})
+        url = '/'.join([self.url_base, flags.FLAGS.get_block])
 
-
-
-    def request_recent_height(self):
-        # block id: 0 - recent_height
-        url_rpc = self.url_base + '/' + FLAGS.get_block_count
         try:
-            r = requests.post(url_rpc)
-            chain_height = get_data_part(r)
-            return chain_height[FLAGS.block_count]
+            response = requests.post(url, params).json()
+            if response['status'] == 'fail':
+                raise Exception('get block failed: %s', response['msg'])
 
+            return response['data']
         except Exception, e:
-            self.logger.error("Agent.GetBytomDataAgent request_recent_height ERROR:" + str(e))
-            raise Exception("request_recent_height error: %s" % str(e))
-            return None
+            raise Exception('get block error: %s', e)
 
+    def request_chain_height(self):
+        url = '/'.join([self.url_base, flags.FLAGS.get_block_count])
+        try:
+            response = requests.post(url).json()
+            if response['status'] == 'fail':
+                raise Exception('get chain height failed: %s', response['msg'])
 
-    
-    def request_block_info(self, block_height):
-
-        data_dict = {FLAGS.get_block_height_arg: block_height}
-        url_rpc = self.url_base + '/' + FLAGS.get_block
-
-        r = requests.post(url_rpc, json.dumps(data_dict))
-        block_info =  get_data_part(r)
-        return block_info
+            return response['data'][flags.FLAGS.block_count]
+        except Exception, e:
+            raise Exception('get chain height failed: %s', e)

@@ -1,5 +1,5 @@
 from flask import Flask
-from collector.urls import register_api
+from blockmeta.urls import register_api
 
 
 app = Flask(__name__)
