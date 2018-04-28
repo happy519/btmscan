@@ -7,7 +7,7 @@ import blockmeta.block.api
 #modules = [(handle, urls, args)]
 MODULES = [
     # address
-    (blockmeta.address.api.AddressAPI, ('/api/address/<string:addr_info>',), {'endpoint': 'address'}),
+    (blockmeta.address.api.AddressAPI, ('/api/address/<string:address>',), {'endpoint': 'address'}),
 
     # tx
     (blockmeta.tx.api.TxAPI, ('/api/tx/<string:tx_hash>',), {'endpoint': 'tx'}),
