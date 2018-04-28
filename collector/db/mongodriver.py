@@ -23,9 +23,10 @@ class MongodbClient:
             res = db.authenticate(mongo_user, mongodb_password)
         if not res:
             raise Exception("Mongodb Authentication Fail")
-    
 
-    def get(self, table, cond):
+    def get(self, table, cond=None):
+        if cond is None:
+            cond = {}
         res = self.mc[table].find_one(cond)
         return res if res else None
 

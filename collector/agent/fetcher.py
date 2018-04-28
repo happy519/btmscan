@@ -14,22 +14,16 @@ class Fetcher:
         params = json.dumps({flags.FLAGS.get_block_height_arg: block_height})
         url = '/'.join([self.url_base, flags.FLAGS.get_block])
 
-        try:
-            response = requests.post(url, params).json()
-            if response['status'] == 'fail':
-                raise Exception('get block failed: %s', response['msg'])
+        response = requests.post(url, params).json()
+        if response['status'] == 'fail':
+            raise Exception('get block failed: %s', response['msg'])
 
-            return response['data']
-        except Exception, e:
-            raise Exception('get block error: %s', e)
+        return response['data']
 
     def request_chain_height(self):
         url = '/'.join([self.url_base, flags.FLAGS.get_block_count])
-        try:
-            response = requests.post(url).json()
-            if response['status'] == 'fail':
-                raise Exception('get chain height failed: %s', response['msg'])
+        response = requests.post(url).json()
+        if response['status'] == 'fail':
+            raise Exception('get chain height failed: %s', response['msg'])
 
-            return response['data'][flags.FLAGS.block_count]
-        except Exception, e:
-            raise Exception('get chain height failed: %s', e)
+        return response['data'][flags.FLAGS.block_count]
