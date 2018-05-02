@@ -15,11 +15,7 @@ class AddressManager:
 
     def handle_address(self, addr):
         try:
-            print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-            print "handle_address: "+ addr
             addr_info = self.driver.request_address_info(addr)
-            print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-            print addr_info
             return addr_info
 
         except Exception, e:
