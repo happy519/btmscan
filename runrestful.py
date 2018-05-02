@@ -1,10 +1,6 @@
-from flask import Flask
-from blockmeta.urls import register_api
+# -*- coding: utf-8 -*-
 
-
-app = Flask(__name__)
-register_api(app)
-
+from blockmeta import app
 
 if __name__ == '__main__':
     app.run(debug=True)

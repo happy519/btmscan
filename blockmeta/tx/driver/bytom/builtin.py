@@ -5,7 +5,8 @@
 from tools import flags, exception
 from blockmeta.db.mongo import MongodbClient
 from blockmeta import constant
-from blockmeta.tools.bytom import remove_0x
+from blockmeta.utils.bytom import remove_0x
+from flask import current_app
 
 FLAGS = flags.FLAGS
 
@@ -16,6 +17,7 @@ class BuiltinDriver:
         return 'builtin'
 
     def __init__(self):
+        self.logger = current_app.logger
         self.mongo_cli = MongodbClient(
             host=FLAGS.mongo_bytom_host,
             port=FLAGS.mongo_bytom_port)
@@ -29,20 +31,27 @@ class BuiltinDriver:
 
             tx_info = self._show_tx(tx)
         except Exception, e:
+            self.logger.error("tx.driver.builtin Error: %s" % str(e))
             raise Exception(e)
         return tx_info
 
-    def get_tx_list(self, offset):
+    def get_tx_list(self, start, offset):
         try:
-            tx_list = []
-            txs = self.mongo_cli.get_last_n(table=FLAGS.transaction_info, args=None, order=FLAGS.block_height, n=offset)
-            for tx in txs:
-                tx_info = self._show_tx(tx)
-                tx_list.append(tx_info)
+            txs = []
+            result = self.mongo_cli.get_many(
+                table=FLAGS.transaction_info,
+                n=offset,
+                sort_key=FLAGS.block_height,
+                ascend=False,
+                skip=start)
 
+            for tx in result:
+                tx_info = self._show_tx(tx)
+                txs.append(tx_info)
+            return txs
         except Exception, e:
-            raise exception.DBError(e)
-        return tx_list
+            self.logger.error("tx.driver.builtin Error: %s" % str(e))
+            raise Exception(e)
 
     def get_tx_by_hash(self, txhash):
         try:
