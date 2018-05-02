@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import re
@@ -13,11 +12,8 @@ def is_hash_prefix(s):
 
 
 def remove_0x(s):
-    if s.startswith("0x"):
-        s = s[2:]
-    return s
+    return s[2:] if s.startswith("0x") else s
 
 
 def format_bytom_neu(value):
-    btm = long(value) / (10 ** 8)
-    return btm
+    return long(value) / (10 ** 8)

@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from flask.ext.restful import Resource, reqparse
@@ -13,7 +12,6 @@ FLAGS = flags.FLAGS
 
 
 class BlockAPI(Resource):
-
     def __init__(self):
         self.logger = current_app.logger
         self.manager = BlockManager()
@@ -23,9 +21,7 @@ class BlockAPI(Resource):
     def get(self, block_id):
         try:
             result = self.manager.handle_block(block_id)
-
             return util.wrap_response(result)
-
         except Exception, e:
             self.logger.error("BlockAPI.get Error: %s" % str(e))
             return util.wrap_error_response('block_error')
@@ -68,7 +64,6 @@ class BlockListAPI(Resource):
             result['no_page'] = 1 if not page else int(page)
 
             return util.wrap_response(data=result)
-
         except Exception, e:
             self.logger.error("BlockListAPI.get Error: %s" % str(e))
             return util.wrap_error_response('block_error')

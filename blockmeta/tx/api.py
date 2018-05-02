@@ -1,14 +1,13 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask.ext.restful import Resource, reqparse
 from flask import current_app
+from flask.ext.restful import Resource, reqparse
 
-from tools import flags
-from blockmeta.utils.bytom import is_hash_prefix
-from blockmeta.utils import util
-from manager import TxManager
 from blockmeta.constant import DEFAULT_OFFSET, DEFAULT_START
+from blockmeta.utils import util
+from blockmeta.utils.bytom import is_hash_prefix
+from manager import TxManager
+from tools import flags
 
 FLAGS = flags.FLAGS
 
@@ -25,8 +24,8 @@ class TxAPI(Resource):
             if not is_hash_prefix(tx_hash):
                 raise Exception("Transaction hash is wrong!")
 
-            result = self.manager.handle_tx(tx_hash) if tx_hash else {}
-            return result
+            # TODO: return 404 if tx corresponding to tx_hash not found
+            return self.manager.handle_tx(tx_hash) if tx_hash else {}
         except Exception, e:
             self.logger.error("TxAPI.get Error: %s" % str(e))
             util.wrap_error_response("tx_error")
