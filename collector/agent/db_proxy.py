@@ -1,5 +1,3 @@
-import copy
-
 from collector.db.mongodriver import MongodbClient
 from tools import flags
 
@@ -19,52 +17,10 @@ class DbProxy:
         self.mongo_cli.update_one(flags.FLAGS.db_status, {}, {'$set': {flags.FLAGS.block_height: height}}, True)
 
     def save_block(self, block):
-        # TODO: implement parse and save block process.
-        # Make sure save block and set_height is atomic
         self.mongo_cli.insert(flags.FLAGS.db_block, block)
         self.mongo_cli.insert_many(flags.FLAGS.db_transaction, block['transactions'])
-
-        address_dict = {}
-        for tx in block['transactions']:
-            for tx_input in tx['inputs']:
-                if 'address' not in tx_input or 'amount' <= 0:
-                    continue
-                address_element = copy.deepcopy(tx_input)
-                address_element['in'] = True
-                address_element['tx_id'] = tx['id']
-                address_element['block_id'] = block['hash']
-                address_element['block_height'] = block['height']
-                if 'address' in address_dict:
-                    address_dict['address'].append(address_element)
-                else:
-                    address_dict = [address_element]
-
-            for output in tx['outputs']:
-                if 'address' not in tx_input and 'amount' > 0:
-                    continue
-                address_element = tx_input
-                address_element['in'] = False
-                address_element['tx_id'] = tx['id']
-                address_element['block_id'] = block['hash']
-                address_element['block_height'] = block['height']
-                if 'address' in address_dict:
-                    address_dict['address'].append(address_element)
-                else:
-                    address_dict['address'] = [address_element]
-
-        address_info_list = []
-        for address in address_dict:
-            address_info = self.mongo_cli.get_one(flags.FLAGS.db_address, {'address': address})
-            if address_info is None:
-                address_info = {
-                    'address': address,
-                    'relevant_txo': address_dict[address]
-                }
-
-            else:
-                address_info['relevant_txo'].append(address_dict[address])
-
-            self.mongo_cli.update_one(flags.FLAGS.db_address, {'address': address}, {'$set': address_info}, True)
+        for transaction in block['transactions']:
+            self.index_address(transaction)
 
         self.set_height(block['height'])
 
