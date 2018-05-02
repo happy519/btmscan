@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # coding=utf-8
 import time
 
@@ -22,6 +21,7 @@ class DataAgent:
     def request_genesis_block(self):
         genesis = self.fetcher.request_block(0)
         self.proxy.save_block(genesis)
+        self.height = 0
 
     def sync(self):
         if self.height is None:
@@ -50,7 +50,6 @@ class DataAgent:
             self.height -= 1
 
     def sync_forever(self):
-        print 'fuck'
         while True:
             self.sync()
             time.sleep(self.ONE_MINUTE)

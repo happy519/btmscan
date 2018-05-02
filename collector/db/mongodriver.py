@@ -88,12 +88,3 @@ class MongodbClient:
     def count_with_cond(self, table, cond):
         res = self.mc[table].find(cond).count()
         return int(res) if res else 0
-
-
-
-		
-
-
-
-
-
