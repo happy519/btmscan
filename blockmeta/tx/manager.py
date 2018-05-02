@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 
 from flask import current_app
-from tools import flags
-from driver.bytom.builtin import BuiltinDriver
+
 from blockmeta.constant import DISPLAY_LEN
+from driver.bytom.builtin import BuiltinDriver
+from tools import flags
 
 FLAGS = flags.FLAGS
 
 
-class TxManager():
+class TxManager:
     """Manages the tx query"""
     def __init__(self):
         self.logger = current_app.logger
@@ -17,8 +18,7 @@ class TxManager():
 
     def handle_tx(self, tx_hash):
         try:
-            tx_info = self.driver.request_tx_info(tx_hash)
-            return tx_info
+            return self.driver.request_tx_info(tx_hash)
         except Exception, e:
             self.logger.error("TxManager.handle_tx Error: %s" % str(e))
             raise Exception("handle_tx error: %s", e)

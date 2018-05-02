@@ -23,13 +23,9 @@ class BuiltinDriver:
 
     def request_block_info(self, arg):
         try:
-            block_id = remove_0x(arg)
-            if len(block_id) == 64:
-                block_info = self.get_block_by_hash(block_id)
-            else:
-                block_info = self.get_block_by_height(block_id)
-
-            return block_info
+            hash_or_height = remove_0x(arg)
+            is_hash = len(hash_or_height) == 64
+            return self.get_block_by_hash(hash_or_height) if is_hash else self.get_block_by_height(hash_or_height)
         except Exception, e:
             self.logger.error("Block.BuiltinDriver.request_block_info Error: %s" % str(e))
             raise Exception("request_block_info error: %s", e)
