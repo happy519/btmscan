@@ -67,4 +67,4 @@ gflags.DEFINE_string('version', 'version', '')
 gflags.DEFINE_string('DEBUG_LOG', 'logs/debug.log', 'location')
 gflags.DEFINE_string('ERROR_LOG', 'logs/error.log', 'location')
 gflags.DEFINE_string('INFO_LOG', 'logs/info.log', 'location')
-
+gflags.DEFINE_string('WARN_LOG', 'logs/warn.log', 'location')

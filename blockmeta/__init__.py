@@ -1,8 +1,12 @@
-# -*- coding: ytf-8 -*-
+# -*- coding: utf-8 -*-
 
 from flask import Flask
 from blockmeta import log, urls
+from tools import flags
+import sys
 
+FLAGS = flags.FLAGS
+FLAGS(sys.argv)
 DEFAULT_APP_NAME = 'btmscan'
 
 
