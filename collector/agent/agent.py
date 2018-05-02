@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # coding=utf-8
 import time
 
@@ -50,7 +49,6 @@ class DataAgent:
             self.height -= 1
 
     def sync_forever(self):
-        print 'fuck'
         while True:
             self.sync()
             time.sleep(self.ONE_MINUTE)
