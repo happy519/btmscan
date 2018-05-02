@@ -21,6 +21,7 @@ class DataAgent:
     def request_genesis_block(self):
         genesis = self.fetcher.request_block(0)
         self.proxy.save_block(genesis)
+        self.height = 0
 
     def sync(self):
         if self.height is None:
