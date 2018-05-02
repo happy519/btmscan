@@ -12,7 +12,6 @@ class DataAgent:
     ONE_MINUTE = 60
 
     def __init__(self):
-        print 'fuck init'
         self.url_base = FLAGS.bytomd_rpc
         self.fetcher = Fetcher()
         self.proxy = DbProxy()
@@ -46,6 +45,7 @@ class DataAgent:
             if db_block['hash'] == node_block['hash']:
                 return
 
+            self.proxy.remove_highest_block(db_block)
             self.proxy.set_height(self.height - 1)
             self.height -= 1
 
