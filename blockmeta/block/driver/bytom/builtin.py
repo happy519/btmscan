@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from tools import flags, exception
-from blockmeta.tools.bytom import is_hash_prefix, remove_0x
+from blockmeta.utils.bytom import is_hash_prefix, remove_0x
 from blockmeta.db.mongo import MongodbClient
-from blockmeta.constant import DEFAULT_OFFSET
+from flask import current_app
 
 FLAGS = flags.FLAGS
 
@@ -15,6 +15,7 @@ class BuiltinDriver:
         return 'builtin'
 
     def __init__(self):
+        self.logger = current_app.logger
         self.mongo_cli = MongodbClient(
             host=FLAGS.mongo_bytom_host,
             port=FLAGS.mongo_bytom_port)
@@ -28,21 +29,23 @@ class BuiltinDriver:
             else:
                 block_info = self.get_block_by_height(block_id)
 
-        except Exception as e:
+            return block_info
+        except Exception, e:
+            self.logger.error("Block.BuiltinDriver.request_block_info Error: %s" % str(e))
             raise Exception("request_block_info error: %s", e)
-        return block_info
 
-    def list_blocks(self, offset=DEFAULT_OFFSET):
+    def list_blocks(self, start, offset):
         try:
             block_list = []
-            blocks = self.get_block_latest_in_range(offset)
+            blocks = self.get_block_latest_in_range(start, offset)
             for block in blocks:
                 block_info = self._show_block(block)
                 block_list.append(block_info)
 
+            return block_list
         except Exception as e:
+            self.logger.error("Block.BuiltinDriver.list_blocks Error: %s" % str(e))
             raise Exception("list_blocks error: %s", e)
-        return block_list
 
     def get_block_by_height(self, height):
         try:
@@ -73,13 +76,14 @@ class BuiltinDriver:
             raise exception.DBError(e)
         return block_info
 
-    def get_block_latest_in_range(self, offset):
+    def get_block_latest_in_range(self, start, offset):
         try:
-            blocks = self.mongo_cli.get_last_n(
+            blocks = self.mongo_cli.get_many(
                 table=FLAGS.block_info,
-                args=None,
-                order=FLAGS.block_height,
-                n=offset)
+                n=offset,
+                sort_key=FLAGS.block_height,
+                ascend=False,
+                skip=start)
         except Exception as e:
             raise exception.DBError(e)
         return blocks
@@ -91,7 +95,6 @@ class BuiltinDriver:
         :param block: block from db
         :return:
         '''
-        block_info = {}
         block_height = block.get(FLAGS.block_height)
         block_hash = block.get(FLAGS.block_id)
         block_version = block.get(FLAGS.version)
@@ -104,16 +107,18 @@ class BuiltinDriver:
         transactions = block.get(FLAGS.transactions)
         block_size = block.get(FLAGS.block_size)
 
-        block_info['block_height'] = block_height
-        block_info['block_hash'] = block_hash
-        block_info['block_version'] = block_version
-        block_info['pre_block_hash'] = pre_block_hash
-        block_info['tx_merkle_root'] = tx_merkle_root
-        block_info['nonce'] = nonce
-        block_info['timestamp'] = timestamp
-        block_info['difficulty'] = difficulty
-        block_info['nbit'] = nbit
-        block_info['transactions'] = transactions
-        block_info['block_size'] = block_size
+        block_info = {
+            'block_height': block_height,
+            'block_hash': block_hash,
+            'block_version': block_version,
+            'pre_block_hash': pre_block_hash,
+            'tx_merkle_root': tx_merkle_root,
+            'nonce': nonce,
+            'timestamp': timestamp,
+            'difficulty': difficulty,
+            'nbit': nbit,
+            'transactions': transactions,
+            'block_size': block_size
+        }
 
         return block_info

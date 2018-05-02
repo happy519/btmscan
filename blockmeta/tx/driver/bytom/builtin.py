@@ -5,7 +5,7 @@
 from tools import flags, exception
 from blockmeta.db.mongo import MongodbClient
 from blockmeta import constant
-from blockmeta.tools.bytom import remove_0x
+from blockmeta.utils.bytom import remove_0x
 
 FLAGS = flags.FLAGS
 

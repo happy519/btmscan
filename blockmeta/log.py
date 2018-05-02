@@ -1,52 +1,44 @@
-import logging,os
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import logging
+import os
+from tools import flags
 from logging.handlers import RotatingFileHandler
 
-class Logger:
-    def __init__(self, app):
-        self.logger = logging.getLogger(app)
-        self.logger.setLevel(logging.DEBUG)
-        self.fmt = logging.Formatter(
-            '%(asctime)s %(levelname)s <%(name)s>: %(message)s '
-            '[in %(pathname)s:%(lineno)d]')
-        self.app = app
+FLAGS = flags.FLAGS
 
-    def addStreamHandler(self, clevel = logging.DEBUG):
-        sh = logging.StreamHandler()
-        sh.setLevel(clevel)
-        sh.setFormatter(self.fmt)
-        self.logger.addHandler(sh)
 
-    def addFileHandler(self, file_name = None, flevel = logging.DEBUG):
-        file_name = self.app if file_name is None else file_name
-        if not os.path.exists('./logs/'):
-            os.mkdir('./logs/')
-        log_path = os.path.join('./logs', '%s.log' % file_name)
-        fh = RotatingFileHandler(log_path, maxBytes=100000, backupCount=10)
-        fh.setLevel(flevel)
-        fh.setFormatter(self.fmt)
-        self.logger.addHandler(fh)
+def init_log(app):
+    formatter = logging.Formatter(
+        '%(asctime)s %(levelname)s <%(name)s>: %(message)s '
+        '[in %(pathname)s:%(lineno)d]')
 
-    def debug(self,message):
-        self.logger.debug(message)
+    debug_log = os.path.join('.', FLAGS.DEBUG_LOG)
+    debug_file_handler = RotatingFileHandler(debug_log, maxBytes=100000, backupCount=10)
+    debug_file_handler.setLevel(logging.DEBUG)
+    debug_file_handler.setFormatter(formatter)
+    app.logger.addHandler(debug_file_handler)
 
-    def info(self,message):
-        self.logger.info(message)
+    info_log = os.path.join('.', FLAGS.INFO_LOG)
+    info_file_handler = RotatingFileHandler(info_log, maxBytes=100000, backupCount=10)
+    info_file_handler.setLevel(logging.INFO)
+    info_file_handler.setFormatter(formatter)
+    app.logger.addHandler(info_file_handler)
 
-    def war(self,message):
-        self.logger.warn(message)
+    warn_log = os.path.join('.', FLAGS.WARN_LOG)
+    warn_file_handler = RotatingFileHandler(warn_log, maxBytes=100000, backupCount=10)
+    warn_file_handler.setLevel(logging.WARN)
+    warn_file_handler.setFormatter(formatter)
+    app.logger.addHandler(warn_file_handler)
 
-    def error(self,message):
-        self.logger.error(message)
+    error_log = os.path.join('.', FLAGS.ERROR_LOG)
+    error_file_handler = RotatingFileHandler(error_log, maxBytes=100000, backupCount=10)
+    error_file_handler.setLevel(logging.ERROR)
+    error_file_handler.setFormatter(formatter)
+    app.logger.addHandler(error_file_handler)
 
-    def cri(self,message):
-        self.logger.critical(message)
-
-if __name__ =='__main__':
-    logyyx = Logger('test')
-    logyyx.addStreamHandler()
-    logyyx.addFileHandler('my_log_name')
-    logyyx.debug('a bug message')
-    logyyx.info('an info message')
-    logyyx.war('a warning message')
-    logyyx.error('a error message')
-    logyyx.cri('a critical message')
+    sh = logging.StreamHandler()
+    sh.setLevel(logging.ERROR)
+    sh.setFormatter(formatter)
+    app.logger.addHandler(sh)

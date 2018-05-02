@@ -5,7 +5,7 @@
 from flask.ext.restful import Resource
 
 from tools import flags
-from blockmeta.tools.bytom import is_hash_prefix
+from blockmeta.utils.bytom import is_hash_prefix
 from manager import TxManager
 from blockmeta.constant import DEFAULT_OFFSET
 
