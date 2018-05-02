@@ -68,6 +68,5 @@ class DbProxy:
             self.mongo_cli.update_one(flags.FLAGS.db_address, {'address': info['address']}, {'$set': info}, True)
 
     def get_block_by_height(self, height):
-        # TODO: implement it
         block = self.mongo_cli.get_one(flags.FLAGS.db_block, {'height': height})
         return block['block_info'] if block is not None else None
