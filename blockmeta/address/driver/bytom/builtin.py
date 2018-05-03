@@ -1,8 +1,7 @@
-#! /usr/bin/env python
 # coding=utf-8
 
 from blockmeta.db.mongo import MongodbClient
-from tools import flags, exception
+from tools import flags
 
 FLAGS = flags.FLAGS
 
@@ -13,71 +12,45 @@ class BuiltinDriver:
         return 'builtin'
        
     def __init__(self):
-        # self.logger = current_app.logger
         self.mongo_cli = MongodbClient(host=FLAGS.mongo_bytom_host, port=FLAGS.mongo_bytom_port)
-
-        # TODO : authentication is needed
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
 
-    def request_address_info(self, addr):
-        try:
-            addr_object = self.get_info_by_addr(addr)
-            if addr_object is None:
-                Exception("Address not found!")
-            addr_info = self._show_addr(addr_object)
-        except Exception, e:
-            raise Exception(e)
+    def request_address_info(self, addr, page=1):
+        addr_object = self.mongo_cli.get_one(table=FLAGS.address_info, cond={FLAGS.address: addr})
+        addr_info = self._show_addr(addr_object, page)
         return addr_info
 
-    def get_info_by_addr(self, addr):
-        try:
-            address = self.mongo_cli.get_many(table=FLAGS.address_info, cond={FLAGS.address: addr})
-            print "address: ", address
-        except Exception, e:
-            raise exception.DBError(e)
-        return address
+    def _show_addr(self, addr, page):
+        if addr is None:
+            return addr
 
-    def _show_addr(self, addr):
-        delta = []
-        tx_list = []
-        asset_map = {}  # all assets stored in this map
+        fields = ['balance', 'sent', 'recv']
+        result = {}
+        for field in fields:
+            result[field] = addr[field]
 
-        for utxo in addr:
-            is_in = utxo.get(FLAGS.is_tx_in)
-            amount = utxo.get(FLAGS.amount)
-            tx_id = utxo.get(FLAGS.tx_id)
-            asset_id = utxo.get(FLAGS.asset_id)
+        start = (page - 1) * 10
+        if start >= len(addr['txs']):
+            raise Exception('page exceed the maximum')
 
-            money = amount * -1 if is_in else amount
-            delta.append(money)
-            tx_list.append(tx_id)
+        end = page * 10
+        if end >= len(addr['txs']):
+            end = len(addr['txs'])
+        tx_ids = addr['txs'][start:end]
+        txs = []
+        for tx_id in tx_ids:
+            tx = self.mongo_cli.get_one(flags.FLAGS.transaction_info, cond={'id': tx_id})
+            txs.append(self.normalize_tx(tx))
+        result['txs'] = txs
+        result['no_page'] = page
+        result['pages'] = len(addr['txs']) / 10 + 1
+        return result
 
-            if asset_id not in asset_map:
-                asset_map[asset_id] = money
-            else:
-                asset_map[asset_id] += money
-
-        balance = 0
-        rev = 0
-        sent = 0
-        for x in delta:
-            balance += x
-            if x > 0:
-                rev += x
-            else:
-                sent -= x
-
-        tx_num = len(addr)
-        address = addr[0].get(FLAGS.address)
-
-        # TODO multi asset, one asset one map
-        addr_info = {
-            'balance': balance,
-            'rev': rev,
-            'sent': sent,
-            'tx_num': tx_num,
-            'addr': address,
-            'assets': asset_map,
-            'transactions': tx_list
-        }
-        return addr_info
+    @staticmethod
+    def normalize_tx(tx):
+        fields = ['block_hash', 'block_height', 'id', 'inputs', 'outputs', 'size', 'status_fail', 'time_range',
+                  'version']
+        result = {}
+        for field in fields:
+            result[field] = tx[field]
+        return result

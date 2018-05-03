@@ -28,7 +28,6 @@ class BlockAPI(Resource):
 
 
 class BlockListAPI(Resource):
-
     def __init__(self):
         self.logger = current_app.logger
         self.manager = BlockManager()

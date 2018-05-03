@@ -5,16 +5,13 @@ import blockmeta.address.api
 import blockmeta.block.api
 import blockmeta.tx.api
 
-#modules = [(handle, urls, args)]
+# modules = [(handle, urls, args)]
 MODULES = [
-    # address
     (blockmeta.address.api.AddressAPI, ('/api/address/<string:address>',), {'endpoint': 'address'}),
 
-    # tx
     (blockmeta.tx.api.TxAPI, ('/api/tx/<string:tx_hash>',), {'endpoint': 'tx'}),
     (blockmeta.tx.api.TxListAPI, ('/api/txs',), {'endpoint': 'txs'}),
 
-    #block
     (blockmeta.block.api.BlockAPI, ('/api/block/<string:block_id>',), {'endpoint': 'block'}),
     (blockmeta.block.api.BlockListAPI, ('/api/blocks',), {'endpoint': 'blocks'}),
 ]
