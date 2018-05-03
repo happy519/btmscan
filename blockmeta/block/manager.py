@@ -2,7 +2,7 @@
 
 from flask import current_app
 
-from blockmeta.constant import DISPLAY_LEN
+from blockmeta.constant import DEFAULT_OFFSET
 from driver.bytom.builtin import BuiltinDriver
 from tools import flags
 
@@ -10,7 +10,6 @@ FLAGS = flags.FLAGS
 
 
 class BlockManager:
-    """Manages the tx query"""
     def __init__(self):
         self.driver = BuiltinDriver()
         self.logger = current_app.logger
@@ -24,13 +23,9 @@ class BlockManager:
 
     def list_blocks(self, start, end):
         blocks = {}
-        try:
-            result, total_num = self.driver.list_blocks(start, end)
-            blocks['total_page'] = total_num / DISPLAY_LEN + 1
-            blocks['blocks'] = result
-            return blocks
-        except Exception, e:
-            self.logger.error("BlockManager.list_blocks Error: %s" % str(e))
-            raise Exception("list_blocks error: %s", e)
+        result, total_num = self.driver.list_blocks(start, end)
+        blocks['pages'] = total_num / DEFAULT_OFFSET + 1
+        blocks['blocks'] = result
+        return blocks
 
 

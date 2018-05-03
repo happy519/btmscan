@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from flask_restful import Api
+
 import blockmeta.address.api
-import blockmeta.tx.api
 import blockmeta.block.api
+import blockmeta.tx.api
 
 #modules = [(handle, urls, args)]
 MODULES = [

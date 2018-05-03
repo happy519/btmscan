@@ -25,7 +25,7 @@ class MongodbClient:
         if not res:
             raise Exception("Mongodb Authentication Fail")
 
-    def get(self, table, cond):
+    def get(self, table, cond=None):
         res = self.mc[table].find_one(cond)
         return res if res else None
 

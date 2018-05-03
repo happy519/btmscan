@@ -1,10 +1,10 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tools import flags, exception
-from blockmeta.utils.bytom import is_hash_prefix, remove_0x
-from blockmeta.db.mongo import MongodbClient
 from flask import current_app
+
+from blockmeta.db.mongo import MongodbClient
+from blockmeta.utils.bytom import is_hash_prefix, remove_0x
+from tools import flags, exception
 
 FLAGS = flags.FLAGS
 
@@ -120,8 +120,5 @@ class BuiltinDriver:
         return block_info
 
     def _get_total_num(self):
-        try:
-            state = self.mongo_cli.get(FLAGS.db_status)
-        except Exception as e:
-            raise exception.DBError(e)
-        return state[FLAGS.block_height]
+        state = self.mongo_cli.get(flags.FLAGS.db_status)
+        return 0 if state is None else state[flags.FLAGS.block_height]
