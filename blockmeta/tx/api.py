@@ -38,7 +38,7 @@ class TxListAPI(Resource):
         self.manager = TxManager()
 
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('offset', type=int, help='block to')
+        self.parser.add_argument('end', type=int, help='block to')
         self.parser.add_argument('start', type=int, help='block from')
         self.parser.add_argument('page', type=int, help='page number')
 
@@ -47,24 +47,24 @@ class TxListAPI(Resource):
     def get(self):
         try:
             args = self.parser.parse_args()
-            start, offset = args.get('start'), args.get('offset')
+            start, end = args.get('start'), args.get('end')
             page = args.get('page')
 
-            # return block in range [start, offset)
+            # return block in range [start, end)
             if not isinstance(start, int):
                 if isinstance(page, int):
                     start = DEFAULT_OFFSET * (page-1)
                 else:
                     start = DEFAULT_START
 
-            if not isinstance(offset, int):
+            if not isinstance(end, int):
                 if isinstance(page, int):
-                    offset = DEFAULT_OFFSET * page
+                    end = DEFAULT_OFFSET * page
                 else:
-                    offset = DEFAULT_OFFSET
+                    end = DEFAULT_OFFSET
 
-            result = self.manager.list_txs(start, offset)
-            result['no_page'] = 1 if not page else int(page)
+            result = self.manager.list_txs(start, end)
+            result['page'] = 1 if not page else int(page)
             return util.wrap_response(data=result)
         except Exception, e:
             self.logger.error("TxListAPI.get Error: %s" % str(e))

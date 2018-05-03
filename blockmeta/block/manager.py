@@ -22,11 +22,11 @@ class BlockManager:
             self.logger.error("BlockManager.handle_block Error: %s" % str(e))
             raise Exception("handle_block error: %s", e)
 
-    def list_blocks(self, start, offset):
+    def list_blocks(self, start, end):
         blocks = {}
         try:
-            result, total_num = self.driver.list_blocks(start, offset)
-            blocks['pages'] = total_num / DISPLAY_LEN + 1
+            result, total_num = self.driver.list_blocks(start, end)
+            blocks['total_page'] = total_num / DISPLAY_LEN + 1
             blocks['blocks'] = result
             return blocks
         except Exception, e:
