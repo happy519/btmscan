@@ -30,15 +30,16 @@ class BuiltinDriver:
             self.logger.error("Block.BuiltinDriver.request_block_info Error: %s" % str(e))
             raise Exception("request_block_info error: %s", e)
 
-    def list_blocks(self, start, offset):
+    def list_blocks(self, start, end):
         try:
             block_list = []
-            blocks = self.get_block_latest_in_range(start, offset)
+            blocks = self.get_block_latest_in_range(start, end)
             for block in blocks:
                 block_info = self._show_block(block)
                 block_list.append(block_info)
+            total_num = self._get_total_num()
 
-            return block_list, block_list[0]['block_height'] + 1
+            return block_list, total_num
         except Exception as e:
             self.logger.error("Block.BuiltinDriver.list_blocks Error: %s" % str(e))
             raise Exception("list_blocks error: %s", e)
@@ -72,11 +73,11 @@ class BuiltinDriver:
             raise exception.DBError(e)
         return block_info
 
-    def get_block_latest_in_range(self, start, offset):
+    def get_block_latest_in_range(self, start, end):
         try:
             blocks = self.mongo_cli.get_many(
                 table=FLAGS.block_info,
-                n=offset,
+                n=end-start,
                 sort_key=FLAGS.block_height,
                 ascend=False,
                 skip=start)
@@ -116,5 +117,11 @@ class BuiltinDriver:
             'transactions': transactions,
             'block_size': block_size
         }
-
         return block_info
+
+    def _get_total_num(self):
+        try:
+            state = self.mongo_cli.get(FLAGS.db_status)
+        except Exception as e:
+            raise exception.DBError(e)
+        return state[FLAGS.block_height]

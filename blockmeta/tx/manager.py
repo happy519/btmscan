@@ -23,12 +23,12 @@ class TxManager:
             self.logger.error("TxManager.handle_tx Error: %s" % str(e))
             raise Exception("handle_tx error: %s", e)
 
-    def list_txs(self, start, offset):
+    def list_txs(self, start, end):
         txs = {}
         try:
-            result = self.driver.get_tx_list(start, offset)
+            result, total_num = self.driver.get_tx_list(start, end)
             if result:
-                txs['pages'] = offset / DISPLAY_LEN + 1
+                txs['total_page'] = total_num / DISPLAY_LEN + 1
                 txs['txs'] = result
             return txs
         except Exception, e:

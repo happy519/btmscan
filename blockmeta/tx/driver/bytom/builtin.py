@@ -35,20 +35,21 @@ class BuiltinDriver:
             raise Exception(e)
         return tx_info
 
-    def get_tx_list(self, start, offset):
+    def get_tx_list(self, start, end):
         try:
             txs = []
             result = self.mongo_cli.get_many(
                 table=FLAGS.transaction_info,
-                n=offset,
+                n=end-start,
                 sort_key=FLAGS.block_height,
                 ascend=False,
                 skip=start)
+            total_num = self.mongo_cli.count(table=FLAGS.transaction_info)
 
             for tx in result:
                 tx_info = self._show_tx(tx)
                 txs.append(tx_info)
-            return txs
+            return txs, total_num
         except Exception, e:
             self.logger.error("tx.driver.builtin Error: %s" % str(e))
             raise Exception(e)
