@@ -38,7 +38,7 @@ class BuiltinDriver:
                 block_info = self._show_block(block)
                 block_list.append(block_info)
 
-            return block_list
+            return block_list, block_list[0]['block_height'] + 1
         except Exception as e:
             self.logger.error("Block.BuiltinDriver.list_blocks Error: %s" % str(e))
             raise Exception("list_blocks error: %s", e)
