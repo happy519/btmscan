@@ -1,10 +1,8 @@
-from flask.ext.restful import Resource, reqparse
+from flask_restful import Resource, reqparse
 from flask import current_app
-
-from blockmeta.utils import util
 from tools import flags
-from manager import BlockManager
-from blockmeta.constant import DEFAULT_OFFSET, DEFAULT_START
+from blockmeta.utils import util
+from manager import SearchManager
 
 FLAGS = flags.FLAGS
 

@@ -18,18 +18,23 @@ class BuiltinDriver:
         self.logger = current_app.logger
 
     def search(self, info):
-        if HEIGHT_RE.match(info):
-            found = self.search_block(int(info))
-            return {'type': found['name'], 'value': found['uri']}
+        try:
+            if HEIGHT_RE.match(info):
+                found = self.search_block(int(info))
+                return {'type': found['name'], 'value': found['uri']}
 
-        if ADDRESS_RE.match(info):
-            found = self.search_address(info)
-            return {'type': found['name'], 'value': found['uri']}
+            if ADDRESS_RE.match(info):
+                found = self.search_address(info)
+                return {'type': found['name'], 'value': found['uri']}
 
-        if LEN_64_RE.match(remove_0x(info)):
-            found = self.search_block(info) or self.search_transaction(info)
-            return {'type': found['name'], 'value': found['uri']}
+            if LEN_64_RE.match(remove_0x(info)):
+                found = self.search_block(info) or self.search_transaction(info)
+                return {'type': found['name'], 'value': found['uri']}
 
+            return None
+
+        except Exception, e:
+            self.logger.error("Search.bytom.BuiltinDriver.search Error: %s" % str(e))
 
     def search_block(self, key):
         value = url_for('block', block_id = key)

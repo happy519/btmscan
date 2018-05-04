@@ -9,11 +9,8 @@ FLAGS = flags.FLAGS
 class SearchManager(manager.Manager):
     """Manages the block querys"""
     def __init__(self, search_driver = None, *args, **kwargs):
-        if not search_driver:
-            search_driver = FLAGS.search_driver
-        self.driver= utils.import_driver(search_driver)
+        self.driver = BuiltinDriver()
         self.logger = current_app.logger
-        super(SearchManager, self).__init__(*args, **kwargs)
 
     def search(self, query, chain_type):
         result = None
