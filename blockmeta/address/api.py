@@ -15,6 +15,7 @@ class AddressAPI(Resource):
         self.parser.add_argument('page', type=int, help='transaction page number')
 
     def get(self, address):
+        address.lower()
         args = self.parser.parse_args()
         page = args.get('page')
         if not isinstance(page, int) or page <= 0:
