@@ -4,7 +4,7 @@ from flask import url_for
 import re
 
 
-ADDRESS_RE = re.compile('^bm[1-9A-HJ-NP-Za-km-z]{40}\\Z')
+ADDRESS_RE = re.compile('bm[1-9A-Za-z]{40,60}\\Z')
 HEIGHT_RE = re.compile('(?:0|[1-9][0-9]*)\\Z')
 LEN_64_RE = re.compile('[0-9a-fA-F]{0,64}\\Z')
 
