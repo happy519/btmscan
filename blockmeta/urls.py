@@ -3,6 +3,7 @@ from flask_restful import Api
 
 import blockmeta.address.api
 import blockmeta.block.api
+import blockmeta.search.api
 import blockmeta.tx.api
 
 # modules = [(handle, urls, args)]
@@ -14,6 +15,8 @@ MODULES = [
 
     (blockmeta.block.api.BlockAPI, ('/api/block/<string:block_id>',), {'endpoint': 'block'}),
     (blockmeta.block.api.BlockListAPI, ('/api/blocks',), {'endpoint': 'blocks'}),
+
+    (blockmeta.search.api.SearchAPI, ('/api/search',), {'endpoint': 'search'}),
 ]
 
 
