@@ -42,6 +42,7 @@ class BuiltinDriver:
             tx = self.mongo_cli.get_one(flags.FLAGS.transaction_info, cond={'id': tx_id})
             txs.append(self.normalize_tx(tx))
         result['txs'] = txs
+        result['tx_num'] = len(addr['txs'])
         result['no_page'] = page
         result['pages'] = len(addr['txs']) / 10 + 1
         return result

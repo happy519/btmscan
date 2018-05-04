@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from flask.ext.restful import Resource, reqparse
 from flask import current_app
+from flask.ext.restful import Resource, reqparse
 
+from blockmeta.constant import DEFAULT_OFFSET
 from blockmeta.utils import util
-from tools import flags
 from manager import BlockManager
-from blockmeta.constant import DEFAULT_OFFSET, DEFAULT_START
+from tools import flags
 
 FLAGS = flags.FLAGS
 

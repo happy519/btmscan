@@ -1,12 +1,12 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 
-from tools import flags, exception
-from blockmeta.db.mongo import MongodbClient
-from blockmeta import constant
-from blockmeta.utils.bytom import remove_0x
 from flask import current_app
+
+from blockmeta.block.manager import BlockManager
+from blockmeta.db.mongo import MongodbClient
+from blockmeta.utils.bytom import remove_0x
+from tools import flags, exception
 
 FLAGS = flags.FLAGS
 
@@ -22,6 +22,7 @@ class BuiltinDriver:
             host=FLAGS.mongo_bytom_host,
             port=FLAGS.mongo_bytom_port)
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
+        self.block_manager = BlockManager()
 
     def request_tx_info(self, tx_hash):
         try:
@@ -40,7 +41,7 @@ class BuiltinDriver:
             txs = []
             result = self.mongo_cli.get_many(
                 table=FLAGS.transaction_info,
-                n=end-start,
+                n=end - start,
                 sort_key=FLAGS.block_height,
                 ascend=False,
                 skip=start)
@@ -58,7 +59,7 @@ class BuiltinDriver:
         try:
             tx = self.mongo_cli.get_one(
                 table=FLAGS.transaction_info, cond={
-                 FLAGS.tx_id: txhash})
+                    FLAGS.tx_id: txhash})
 
         except Exception, e:
             raise exception.DBError(e)
@@ -94,42 +95,17 @@ class BuiltinDriver:
         return txouts
 
     def _show_tx(self, tx):
-        tx_info = {}
-        tx_id = tx.get(FLAGS.tx_id)
-        tx_version = tx.get(FLAGS.version)
-        block_height = tx.get(FLAGS.block_height)
-        tx_in = tx.get(FLAGS.transaction_in)
-        tx_out = tx.get(FLAGS.transaction_out)
-        tx_size = tx.get(FLAGS.size)
-        is_coinbase = tx.get(FLAGS.coinbase)
-        value_in = 0
-        value_out = 0
+        fields = ['block_hash', 'block_height', 'id', 'inputs', 'outputs', 'size', 'status_fail', 'time_range',
+                  'version']
+        result = {}
+        for field in fields:
+            result[field] = tx[field]
 
-        if len(tx_in) != 0:
-            for tx in tx_in:
-                if tx.get(FLAGS.tx_io_type) == "spend" and tx.get(FLAGS.asset_id) == constant.BYTOM_ASSET_ID:
-                    value_in += tx.get(FLAGS.amount)
+        block = self.block_manager.handle_block(result['block_hash'])
+        result['block'] = block
 
-        if len(tx_out) != 0:
-            for tx in tx_out:
-                # type can be "retain"
-                if tx.get(FLAGS.tx_io_type) == "control" and tx.get(FLAGS.asset_id) == constant.BYTOM_ASSET_ID:
-                    value_out += tx.get(FLAGS.amount)
+        state = self.mongo_cli.get(flags.FLAGS.db_status)
+        height = 0 if state is None else state[flags.FLAGS.block_height]
+        result['confirmation'] = height - result['block_height'] + 1
 
-        tx_fee = value_in - value_out
-        if is_coinbase:
-            tx_fee = 0
-
-        tx_info['tx_id'] = tx_id
-        tx_info['version'] = tx_version
-        tx_info['block_height'] = block_height
-        tx_info['value_in'] = value_in
-        tx_info['value_out'] = value_out
-        tx_info['fee'] = tx_fee
-        tx_info['size'] = tx_size
-        tx_info['is_coinbase'] = is_coinbase
-        tx_info['txin'] = tx_in
-        tx_info['txout'] = tx_out
-
-        return tx_info
-
+        return result
