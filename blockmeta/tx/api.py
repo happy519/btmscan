@@ -20,6 +20,7 @@ class TxAPI(Resource):
         super(TxAPI, self).__init__()
 
     def get(self, tx_hash):
+        tx_hash.lower()
         try:
             if not is_hash_prefix(tx_hash):
                 raise Exception("Transaction hash is wrong!")

@@ -19,6 +19,7 @@ class BlockAPI(Resource):
         super(BlockAPI, self).__init__()
 
     def get(self, block_id):
+        block_id.lower()
         try:
             result = self.manager.handle_block(block_id)
             return util.wrap_response(result)
