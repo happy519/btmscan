@@ -28,7 +28,7 @@ class BuiltinDriver:
                 return {'type': 'block', 'value': info}
 
             if ADDRESS_RE.match(info):
-                return {'type': 'block', 'value': info}
+                return {'type': 'address', 'value': info}
 
             hash_value = remove_0x(info)
             if LEN_64_RE.match(hash_value):
