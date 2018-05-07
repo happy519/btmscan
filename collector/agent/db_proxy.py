@@ -37,7 +37,9 @@ class DbProxy:
                 if tx_input['type'] != 'spend' or tx_input.get('asset_id').lower() != self.btm_id:
                     continue
 
-                address = tx_input['address']
+                address = tx_input.get('address', None)
+                if address is None:
+                    continue
                 address_info = address_dict.get(address, None) or self.mongo_cli.get_one(flags.FLAGS.address_info,
                                                                                          {'address': address})
                 if address_info is None:
