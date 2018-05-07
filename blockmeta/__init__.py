@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 from flask import Flask
+
 from blockmeta import log, urls
 from tools import flags
-import sys
 
 FLAGS = flags.FLAGS
 FLAGS(sys.argv)
