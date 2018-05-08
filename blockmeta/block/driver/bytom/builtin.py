@@ -103,6 +103,7 @@ class BuiltinDriver:
         nbit = block.get(FLAGS.block_nbit)
         transactions = block.get(FLAGS.transactions)
         block_size = block.get(FLAGS.block_size)
+        transaction_status_hash = block.get(FLAGS.transaction_status_hash)
 
         block_info = {
             'block_height': block_height,
@@ -115,7 +116,8 @@ class BuiltinDriver:
             'difficulty': difficulty,
             'nbit': nbit,
             'transactions': transactions,
-            'block_size': block_size
+            'block_size': block_size,
+            'transaction_status_hash': transaction_status_hash
         }
         return block_info
 
