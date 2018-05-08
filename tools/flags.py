@@ -45,6 +45,7 @@ gflags.DEFINE_string('timestamp', 'timestamp', '')
 gflags.DEFINE_string('difficulty', 'difficulty', '')
 gflags.DEFINE_string('block_nbit', 'bits', '')
 gflags.DEFINE_string('block_size', 'size', '')
+gflags.DEFINE_string('block_fee', 'fee', '')
 
 
 gflags.DEFINE_string('transactions', 'transactions', '')

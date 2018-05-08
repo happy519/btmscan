@@ -3,7 +3,7 @@
 from flask import current_app
 
 from blockmeta.db.mongo import MongodbClient
-from blockmeta.utils.bytom import is_hash_prefix, remove_0x
+from blockmeta.utils.bytom import is_hash_prefix, remove_0x, get_base_reward
 from tools import flags, exception
 
 FLAGS = flags.FLAGS
@@ -103,6 +103,7 @@ class BuiltinDriver:
         nbit = block.get(FLAGS.block_nbit)
         transactions = block.get(FLAGS.transactions)
         block_size = block.get(FLAGS.block_size)
+        block_fee = block.get(FLAGS.block_fee)
 
         block_info = {
             'block_height': block_height,
@@ -115,7 +116,9 @@ class BuiltinDriver:
             'difficulty': difficulty,
             'nbit': nbit,
             'transactions': transactions,
-            'block_size': block_size
+            'block_size': block_size,
+            'block_fee': block_fee,
+            'reward': block_fee + get_base_reward(block_height)
         }
         return block_info
 

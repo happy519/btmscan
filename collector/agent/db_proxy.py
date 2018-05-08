@@ -19,12 +19,13 @@ class DbProxy:
         self.mongo_cli.update_one(flags.FLAGS.db_status, {}, {'$set': {flags.FLAGS.block_height: height}}, True)
 
     def save_block(self, block):
-        (block['fee'], block['coinbase']) = util.get_block_reward(block)
+        block['fee'] = util.get_block_fee(block)
         self.mongo_cli.insert(flags.FLAGS.block_info, block)
 
         transactions = []
         for transaction in block['transactions']:
-            transaction.update({'block_height': block['height'], 'block_hash': block['hash']})
+            tx_fee = util.get_tx_fee(transaction) if not util.is_coinbase(transaction) else 0
+            transaction.update({'block_height': block['height'], 'block_hash': block['hash'], 'coinbase': util.is_coinbase(transaction), 'tx_fee': tx_fee})
             transactions.append(transaction)
         self.mongo_cli.insert_many(flags.FLAGS.transaction_info, transactions)
         self.index_address(transactions)

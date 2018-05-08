@@ -96,7 +96,7 @@ class BuiltinDriver:
 
     def _show_tx(self, tx):
         fields = ['block_hash', 'block_height', 'id', 'inputs', 'outputs', 'size', 'status_fail', 'time_range',
-                  'version']
+                  'version', 'coinbase', 'tx_fee']
         result = {}
         for field in fields:
             result[field] = tx[field]
