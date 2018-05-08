@@ -3,7 +3,8 @@
 from flask import current_app
 
 from blockmeta.db.mongo import MongodbClient
-from blockmeta.utils.bytom import is_hash_prefix, remove_0x, get_base_reward
+from blockmeta.utils.bytom import is_hash_prefix, remove_0x, get_base_reward, get_miner_addr, get_pool
+from blockmeta.utils.relay import BYTOM_MINERS
 from tools import flags, exception
 
 FLAGS = flags.FLAGS
@@ -105,6 +106,9 @@ class BuiltinDriver:
         block_size = block.get(FLAGS.block_size)
         block_fee = block.get(FLAGS.block_fee)
 
+        miner_addr = get_miner_addr(block)
+
+
         block_info = {
             'block_height': block_height,
             'block_hash': block_hash,
@@ -118,10 +122,14 @@ class BuiltinDriver:
             'transactions': transactions,
             'block_size': block_size,
             'block_fee': block_fee,
-            'reward': block_fee + get_base_reward(block_height)
+            'reward': block_fee + get_base_reward(block_height),
+            'pool': get_pool(miner_addr)
         }
         return block_info
 
     def _get_total_num(self):
         state = self.mongo_cli.get(flags.FLAGS.db_status)
         return 0 if state is None else state[flags.FLAGS.block_height]
+
+
+

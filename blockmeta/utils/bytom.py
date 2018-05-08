@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from relay import BYTOM_MINERS
 import re
 
 HASH_PREFIX_RE = re.compile('[0-9a-fA-F]{0,64}\\Z')
@@ -21,3 +21,29 @@ def format_bytom_neu(value):
 
 def get_base_reward(hight):
     return BASE_SUBSIDY >> (hight/SUBSIDY_REDUCTION_INTERVAL)
+
+def get_miner_addr(block):
+    for tx in block['transactions']:
+        if is_coinbase(tx):
+            for tx_out in tx['outputs']:
+                return tx_out['address'] if 'address' in tx_out else None
+
+    raise Exception('No coinbase transaction in block %s', block['height'])
+
+
+def is_coinbase(tx):
+    for tx_in in tx['inputs']:
+        if tx_in['type'] == 'coinbase':
+            return True
+
+    return False
+
+def get_pool(addr):
+    if not addr:
+        return None
+
+    for key, value in BYTOM_MINERS.items():
+        if addr in value:
+            return key
+
+    return addr
