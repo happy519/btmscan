@@ -10,7 +10,7 @@ class BuiltinDriver:
     @property
     def type(self):
         return 'builtin'
-       
+
     def __init__(self):
         self.mongo_cli = MongodbClient(host=FLAGS.mongo_bytom_host, port=FLAGS.mongo_bytom_port)
         self.mongo_cli.use_db(FLAGS.mongo_bytom)
@@ -47,11 +47,14 @@ class BuiltinDriver:
         result['pages'] = len(addr['txs']) / 10 + 1
         return result
 
-    @staticmethod
-    def normalize_tx(tx):
+    def normalize_tx(self, tx):
         fields = ['block_hash', 'block_height', 'id', 'inputs', 'outputs', 'size', 'status_fail', 'time_range',
                   'version']
         result = {}
         for field in fields:
             result[field] = tx[field]
+
+        block = self.mongo_cli.get_one(table=FLAGS.block_info, cond={FLAGS.block_height: int(tx.get('block_height'))})
+        if block:
+            result['timestamp'] = block.get('timestamp')
         return result
