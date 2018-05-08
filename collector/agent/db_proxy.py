@@ -1,9 +1,9 @@
 from collector.db.mongodriver import MongodbClient
 from tools import flags
-
+from tools import constant
+from tools import  util
 
 class DbProxy:
-    btm_id = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
     def __init__(self):
         self.url_base = flags.FLAGS.bytomd_rpc
@@ -19,6 +19,7 @@ class DbProxy:
         self.mongo_cli.update_one(flags.FLAGS.db_status, {}, {'$set': {flags.FLAGS.block_height: height}}, True)
 
     def save_block(self, block):
+        (block['fee'], block['coinbase']) = util.get_block_reward(block)
         self.mongo_cli.insert(flags.FLAGS.block_info, block)
 
         transactions = []
@@ -34,7 +35,7 @@ class DbProxy:
         address_dict = {}
         for transaction in transactions:
             for tx_input in transaction['inputs']:
-                if tx_input['type'] != 'spend' or tx_input.get('asset_id').lower() != self.btm_id:
+                if tx_input['type'] != 'spend' or tx_input.get('asset_id').lower() != constant.BTM_ID:
                     continue
 
                 address = tx_input.get('address', None)
@@ -53,7 +54,7 @@ class DbProxy:
                 address_dict[address] = address_info
 
             for tx_output in transaction['outputs']:
-                if tx_output.get('type') != 'control' or tx_output.get('asset_id').lower() != self.btm_id:
+                if tx_output.get('type') != 'control' or tx_output.get('asset_id').lower() != constant.BTM_ID:
                     continue
 
                 address = tx_output.get('address')
@@ -92,7 +93,7 @@ class DbProxy:
         address_dict = {}
         for transaction in block['transactions']:
             for tx_input in transaction['inputs']:
-                if tx_input['type'] != 'spend' or tx_input.get('asset_id').lower() != self.btm_id:
+                if tx_input['type'] != 'spend' or tx_input.get('asset_id').lower() != constant.BTM_ID:
                     continue
 
                 address = tx_input.get('address')
@@ -108,7 +109,7 @@ class DbProxy:
                 address_dict[address] = address_info
 
             for tx_output in transaction['outputs']:
-                if tx_output['type'] != 'control' or tx_output.get('asset_id').lower() != self.btm_id:
+                if tx_output['type'] != 'control' or tx_output.get('asset_id').lower() != constant.BTM_ID:
                     continue
 
                 address = tx_output.get('address')
